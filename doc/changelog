@@ -1,0 +1,5 @@
+1. discover fs
+2. diff fs vs cmdlogs
+3. marshal cmdlogs
+4. driver
+5. sync
