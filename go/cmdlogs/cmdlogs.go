@@ -10,13 +10,11 @@ type NodeState struct {
 	CmdLogs     []CmdLog // Ordered CmdLog
 }
 
-type CmdType int
-
-const (
-	CmdUnspecified CmdType = iota
-	CmdNew
-	CmdDelete
-)
+type CmdLog struct {
+	Version    uint64
+	MasterName string
+	Cmd        *Cmd
+}
 
 type Cmd struct {
 	Type     CmdType
@@ -25,12 +23,18 @@ type Cmd struct {
 	Checksum []byte // Must be filled for CmdNew
 }
 
-type CmdLog struct {
-	Version    uint64
-	MasterName string
-	Cmd        Cmd
+type CmdType int
+
+const (
+	CmdUnspecified CmdType = iota
+	CmdNew
+	CmdDelete
+)
+
+func (state *NodeState) Check() error {
+	return nil
 }
 
-func (state *NodeState) Markshal(w io.Writer) err {
+func (state *NodeState) Marshal(w io.Writer) error {
 	return nil
 }
