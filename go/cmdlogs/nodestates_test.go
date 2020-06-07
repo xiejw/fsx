@@ -2,6 +2,7 @@ package cmdlogs
 
 import (
 	"bytes"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -96,5 +97,31 @@ func TestMarshal(t *testing.T) {
 	if got != expected {
 		t.Fatalf("marshal content mismatches. expected: %v, got: %v",
 			expected, got)
+	}
+}
+
+func TestUnmarshal(t *testing.T) {
+	state := &NodeState{
+		Name:        "test_node",
+		NextVersion: 1,
+		CmdLogs: []CmdLog{
+			{
+				Version:    0,
+				MasterName: "test_node",
+				Cmd:        &Cmd{CmdNew, "", "test_file_1", []byte("abc")},
+			},
+		},
+	}
+
+	var buf bytes.Buffer
+	err := state.Marshal(&buf)
+	assertNoError(t, err)
+
+	got, err := Unmarshal(buf.Bytes())
+	assertNoError(t, err)
+
+	if !reflect.DeepEqual(got, state) {
+		t.Fatalf("unmarshal content mismatches. expected: %v, got: %v",
+			state, got)
 	}
 }

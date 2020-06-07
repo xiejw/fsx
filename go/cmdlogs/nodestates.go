@@ -1,6 +1,7 @@
 package cmdlogs
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -37,4 +38,22 @@ func (state *NodeState) Marshal(w io.Writer) error {
 		return err
 	}
 	return nil
+}
+
+func Unmarshal(data []byte) (*NodeState, error) {
+	state := &NodeState{}
+	err := json.Unmarshal(data, state)
+	if err != nil {
+		return nil, err
+	}
+	return state, nil
+}
+
+func (state *NodeState) String() string {
+	var buf bytes.Buffer
+	err := state.Marshal(&buf)
+	if err != nil {
+		panic(err)
+	}
+	return buf.String()
 }
