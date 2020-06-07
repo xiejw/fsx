@@ -9,7 +9,7 @@ var (
 
 type FileItem struct {
 	FullPath string // Full path, but relative to base dir.
-	Checksum []byte // Allows to be empty.
+	Checksum []byte // Could be empty.
 }
 
 // Order is not guaranteed.

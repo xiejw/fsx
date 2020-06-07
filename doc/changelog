@@ -1,10 +1,14 @@
-- sync
-- driver
-- marshal cmdlogs
-- use scanner to generate it.
-- create cmdlogs from diff.
-- diff snapshot.
+## TODO
 
+- create cmdlogs from diff.
+- use scanner to generate it.
+- marshal cmdlogs
+- driver
+- sync
+
+## Logs
+
+2020-06-07 added diff snapshot.
 2020-06-07 added snapshot and one impl.
 2020-06-07 moved scanner lib to lunar repo.
 2020-06-06 added scanner lib.
