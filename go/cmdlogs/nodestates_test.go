@@ -60,6 +60,23 @@ func TestCheckFailedWithNextVersion(t *testing.T) {
 	assertErrorMsg(t, err, "NextVersion")
 }
 
+func TestCheckFailedWithCmdLogVersion(t *testing.T) {
+	state := &NodeState{
+		Name:        "test_node",
+		NextVersion: 1,
+		CmdLogs: []CmdLog{
+			{
+				Version:    1,
+				MasterName: "test_node",
+				Cmd:        &Cmd{CmdNew, "", "test_file_1", []byte("abc")},
+			},
+		},
+	}
+
+	err := state.Check()
+	assertErrorMsg(t, err, "CmdLog version")
+}
+
 func TestMarshal(t *testing.T) {
 	state := &NodeState{
 		Name:        "test_node",

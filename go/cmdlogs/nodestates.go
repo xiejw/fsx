@@ -20,8 +20,14 @@ func (state *NodeState) Check() error {
 	}
 	if state.NextVersion != uint64(len(state.CmdLogs)) {
 		return fmt.Errorf(
-			"NextVersion field check error. got: %v, expected: %v",
+			"NextVersion field check error. got: %v, expected: %v.",
 			state.NextVersion, len(state.CmdLogs))
+	}
+	for i, cmdLog := range state.CmdLogs {
+		if cmdLog.Version != uint64(i) {
+			return fmt.Errorf("At %v, the CmdLog version is not right: %v.",
+				i, cmdLog.Version)
+		}
 	}
 
 	return nil
