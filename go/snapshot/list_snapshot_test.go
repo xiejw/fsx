@@ -11,6 +11,7 @@ func assertNoErr(t *testing.T, err error) {
 	}
 }
 
+// Asserts that items in sp are matching the list of `expected`.
 func assertSnapshot(t *testing.T, expected []string, sp Snapshot) {
 	t.Helper()
 	expectedMap := make(map[string]bool)
@@ -46,6 +47,18 @@ func TestAdd(t *testing.T) {
 	assertSnapshot(t, []string{"dir/a"}, sp)
 }
 
+func TestAddDup(t *testing.T) {
+	var err error
+	sp := New()
+	err = sp.Add(&FileItem{FullPath: "dir/a"})
+	assertNoErr(t, err)
+
+	err = sp.Add(&FileItem{FullPath: "dir/a"})
+	if err != ErrItemAlreadyExist {
+		t.Errorf("error mismatches.")
+	}
+}
+
 func TestDelete(t *testing.T) {
 	var err error
 	sp := New()
@@ -57,4 +70,64 @@ func TestDelete(t *testing.T) {
 	assertNoErr(t, err)
 
 	assertSnapshot(t, []string{}, sp)
+}
+
+func TestDeleteNotExist(t *testing.T) {
+	var err error
+	sp := New()
+
+	err = sp.Add(&FileItem{FullPath: "dir/a"})
+	assertNoErr(t, err)
+
+	err = sp.Delete("dir/a")
+	assertNoErr(t, err)
+
+	err = sp.Delete("dir/a")
+	if err != ErrItemNotExist {
+		t.Errorf("error mismatches.")
+	}
+}
+
+func TestLookUp(t *testing.T) {
+	var err error
+	sp := New()
+	err = sp.Add(&FileItem{FullPath: "dir/a"})
+	assertNoErr(t, err)
+
+	if sp.LookUp("dir/b") != nil {
+		t.Errorf("unexpected item for `dir/b`.")
+	}
+
+	if sp.LookUp("dir/a") == nil {
+		t.Errorf("unexpected missing item for `dir/a`.")
+	}
+}
+
+func TestComplicatedCase(t *testing.T) {
+	var err error
+	sp := New()
+
+	err = sp.Add(&FileItem{FullPath: "dir/a"})
+	assertNoErr(t, err)
+	err = sp.Add(&FileItem{FullPath: "dir/b"})
+	assertNoErr(t, err)
+	err = sp.Add(&FileItem{FullPath: "dir/c"})
+	assertNoErr(t, err)
+
+	err = sp.Delete("dir/b")
+	assertNoErr(t, err)
+	err = sp.Delete("dir/c")
+	assertNoErr(t, err)
+
+	err = sp.Add(&FileItem{FullPath: "dir/d"})
+	assertNoErr(t, err)
+	err = sp.Add(&FileItem{FullPath: "dir/e"})
+	assertNoErr(t, err)
+	err = sp.Add(&FileItem{FullPath: "dir/f"})
+	assertNoErr(t, err)
+
+	err = sp.Delete("dir/f")
+	assertNoErr(t, err)
+
+	assertSnapshot(t, []string{"dir/a", "dir/d", "dir/e"}, sp)
 }
