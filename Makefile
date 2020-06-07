@@ -11,3 +11,7 @@ test:
 
 bench:
 	go test -bench=. ${PACKAGES}
+
+# use go get package/path to update
+tidy:
+	go mod tidy
