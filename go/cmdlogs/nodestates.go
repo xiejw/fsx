@@ -1,6 +1,7 @@
 package cmdlogs
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 )
@@ -26,5 +27,14 @@ func (state *NodeState) Check() error {
 }
 
 func (state *NodeState) Marshal(w io.Writer) error {
+	c, err := json.MarshalIndent(state, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Write(c)
+	if err != nil {
+		return err
+	}
 	return nil
 }

@@ -75,4 +75,26 @@ func TestMarshal(t *testing.T) {
 	var buf bytes.Buffer
 	err := state.Marshal(&buf)
 	assertNoError(t, err)
+
+	got := buf.String()
+	expected := `{
+  "Name": "test_node",
+  "NextVersion": 1,
+  "CmdLogs": [
+    {
+      "Version": 0,
+      "MasterName": "test_node",
+      "Cmd": {
+        "Type": 1,
+        "Dir": "",
+        "FileName": "test_file_1",
+        "Checksum": "YWJj"
+      }
+    }
+  ]
+}`
+	if got != expected {
+		t.Fatalf("marshal content mismatches. expected: %v, got: %v",
+			expected, got)
+	}
 }
