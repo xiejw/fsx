@@ -2,5 +2,7 @@
 4. driver
 3. marshal cmdlogs
 2. diff fs vs cmdlogs
-1. discover fs
-2020-06-06 added NodeState with CmdLog.
+1. define snapshot and use scanner to generate it.
+
+2020-06-06 added scanner lib.
+2020-06-06 added cmdlogs.{NodeState,CmdLog}.
