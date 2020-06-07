@@ -1,4 +1,4 @@
-package cmdlogs
+package node
 
 type CmdLog struct {
 	Version    uint64

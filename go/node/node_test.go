@@ -1,4 +1,4 @@
-package cmdlogs
+package node
 
 import (
 	"bytes"
@@ -27,7 +27,7 @@ func assertErrorMsg(t *testing.T, err error, msg string) {
 }
 
 func TestCheckPassed(t *testing.T) {
-	state := &NodeState{
+	state := &Node{
 		Name:        "test_node",
 		NextVersion: 1,
 		CmdLogs: []CmdLog{
@@ -44,7 +44,7 @@ func TestCheckPassed(t *testing.T) {
 }
 
 func TestCheckFailedWithNextVersion(t *testing.T) {
-	state := &NodeState{
+	state := &Node{
 		Name:        "test_node",
 		NextVersion: 0,
 		CmdLogs: []CmdLog{
@@ -61,7 +61,7 @@ func TestCheckFailedWithNextVersion(t *testing.T) {
 }
 
 func TestCheckFailedWithCmdLogVersion(t *testing.T) {
-	state := &NodeState{
+	state := &Node{
 		Name:        "test_node",
 		NextVersion: 1,
 		CmdLogs: []CmdLog{
@@ -78,7 +78,7 @@ func TestCheckFailedWithCmdLogVersion(t *testing.T) {
 }
 
 func TestMarshal(t *testing.T) {
-	state := &NodeState{
+	state := &Node{
 		Name:        "test_node",
 		NextVersion: 1,
 		CmdLogs: []CmdLog{
@@ -98,6 +98,7 @@ func TestMarshal(t *testing.T) {
 	expected := `{
   "Name": "test_node",
   "NextVersion": 1,
+  "IsMaster": false,
   "CmdLogs": [
     {
       "Version": 0,
@@ -118,7 +119,7 @@ func TestMarshal(t *testing.T) {
 }
 
 func TestUnmarshal(t *testing.T) {
-	state := &NodeState{
+	state := &Node{
 		Name:        "test_node",
 		NextVersion: 1,
 		CmdLogs: []CmdLog{

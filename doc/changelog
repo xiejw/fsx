@@ -4,5 +4,6 @@
 2. diff fs vs cmdlogs
 1. define snapshot and use scanner to generate it.
 
+2020-06-07 moved scanner lib to lunar repo.
 2020-06-06 added scanner lib.
 2020-06-06 added cmdlogs.{NodeState,CmdLog}.

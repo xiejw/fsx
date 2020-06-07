@@ -1,4 +1,4 @@
-package cmdlogs
+package node
 
 import (
 	"bytes"
@@ -7,14 +7,15 @@ import (
 	"io"
 )
 
-type NodeState struct {
-	Name        string   // Must be uinque in the cluster.
-	NextVersion uint64   // Points to next verison.
+type Node struct {
+	Name        string // Must be uinque in the cluster.
+	NextVersion uint64 // Points to next verison.
+	IsMaster    bool
 	CmdLogs     []CmdLog // Ordered CmdLog
 }
 
 // Performs a sanity check on the state.
-func (state *NodeState) Check() error {
+func (state *Node) Check() error {
 	if state.Name == "" {
 		return fmt.Errorf("name cannot be empty.")
 	}
@@ -33,7 +34,7 @@ func (state *NodeState) Check() error {
 	return nil
 }
 
-func (state *NodeState) Marshal(w io.Writer) error {
+func (state *Node) Marshal(w io.Writer) error {
 	c, err := json.MarshalIndent(state, "", "  ")
 	if err != nil {
 		return err
@@ -46,8 +47,8 @@ func (state *NodeState) Marshal(w io.Writer) error {
 	return nil
 }
 
-func Unmarshal(data []byte) (*NodeState, error) {
-	state := &NodeState{}
+func Unmarshal(data []byte) (*Node, error) {
+	state := &Node{}
 	err := json.Unmarshal(data, state)
 	if err != nil {
 		return nil, err
@@ -55,7 +56,7 @@ func Unmarshal(data []byte) (*NodeState, error) {
 	return state, nil
 }
 
-func (state *NodeState) String() string {
+func (state *Node) String() string {
 	var buf bytes.Buffer
 	err := state.Marshal(&buf)
 	if err != nil {
