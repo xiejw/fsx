@@ -1,0 +1,6 @@
+# Go outputs
+.build
+
+# Vim
+*.swo
+*.swp
