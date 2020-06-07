@@ -1,9 +1,11 @@
-5. sync
-4. driver
-3. marshal cmdlogs
-2. diff fs vs cmdlogs
-1. define snapshot and use scanner to generate it.
+- sync
+- driver
+- marshal cmdlogs
+- use scanner to generate it.
+- create cmdlogs from diff.
+- diff snapshot.
 
+2020-06-07 added snapshot and one impl.
 2020-06-07 moved scanner lib to lunar repo.
 2020-06-06 added scanner lib.
 2020-06-06 added cmdlogs.{NodeState,CmdLog}.
