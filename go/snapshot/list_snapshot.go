@@ -1,9 +1,20 @@
 package snapshot
 
+// One implementation for Snaptshot based on list.
+//
+// Internally, a map is created to speed up the LookUp.
 type ListSnapshot struct {
 	array []*FileItem    // nil is the hole.
 	index map[string]int // Index the path to array index.
 	holes []int          // Stores the hole index in array.
+}
+
+func New() Snapshot {
+	return &ListSnapshot{
+		array: make([]*FileItem, 0),
+		index: make(map[string]int),
+		holes: make([]int, 0),
+	}
 }
 
 func (sp *ListSnapshot) LookUp(fullPath string) *FileItem {
