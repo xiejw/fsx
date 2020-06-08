@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 
+	"github.com/golang/glog"
 	"github.com/xiejw/lunar"
 	"github.com/xiejw/lunar/scanner"
 
@@ -15,8 +17,17 @@ func main() {
 
 	sp := snapshot.New()
 
-	scanner.Walk(".", []scanner.Filter{scanner.NewCommonFilter(nil)},
+	path, err := filepath.Abs(".")
+	if err != nil {
+		glog.Fatalf("unexpected error: %v", err)
+	}
+
+	scanner.Walk(path, []scanner.Filter{scanner.NewCommonFilter([]string{})},
 		func(metadata scanner.FileMetadata) {
+			info := metadata.Info
+			if info.IsDir() {
+				return
+			}
 			sp.Add(&snapshot.FileItem{FullPath: metadata.Path})
 		})
 
