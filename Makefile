@@ -1,13 +1,20 @@
-BUILD=.build
-PACKAGES=github.com/xiejw/fsx/go/...
-CMD_PACKAGES=github.com/xiejw/fsx/cmd/...
+REPO=fsx
 
-compile: compile_pkg
-	mkdir -p ${BUILD} && \
-	  go build -o ${BUILD}/snapshot cmd/snapshot/main.go
+BUILD=.build
+PACKAGES=github.com/xiejw/${REPO}/go/...
+CMD_PACKAGES=github.com/xiejw/${REPO}/cmd/...
+CMDS=$(patsubst cmd/%,%,$(wildcard cmd/*))
+
+compile: compile_pkg compile_cmd
 
 compile_pkg:
 	go build ${PACKAGES}
+
+compile_cmd:
+	@mkdir -p ${BUILD}
+	@for cmd in ${CMDS}; do \
+		echo 'compile cmd/'$$cmd && go build -o ${BUILD}/$$cmd cmd/$$cmd/main.go; \
+	done
 
 fmt:
 	go fmt ${PACKAGES}
@@ -19,7 +26,7 @@ test:
 bench:
 	go test -bench=. ${PACKAGES}
 
-# use go get package/path to update
-tidy:
+clean:
 	go mod tidy
+	@echo 'clean' ${BUILD} && rm -rf ${BUILD}
 
