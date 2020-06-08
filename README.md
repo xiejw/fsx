@@ -1,9 +1,14 @@
-# FsX: Distributed File System
+# FsX: Distributed File Backup System
 
 FsX is designed as a robust, distributed, scalable,
-unidirectional-synchronization file system. It is perfect for
+unidirectional-synchronization file backup system. It is perfect for
 infrequent-modification, large volume file system with replicas, e.g., photo
 repository.
+
+It is designed with the following features in mind:
+1. full history in logs. 
+2. scalability
+3. simple diff cross replicas.
 
 Each file repository is fully managed by a process `fsx`, with exception for
 `master` node.
