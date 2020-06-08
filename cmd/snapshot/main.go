@@ -5,8 +5,8 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/xiejw/lunar"
-	"github.com/xiejw/lunar/scanner"
 
+	"github.com/xiejw/fsx/go/fs"
 	"github.com/xiejw/fsx/go/snapshot"
 )
 
@@ -16,16 +16,12 @@ func main() {
 
 	sp := snapshot.New()
 
-	var err error
-	err = scanner.Walk(".",
-		[]scanner.Filter{scanner.NewCommonFilter([]string{})},
-		func(metadata scanner.FileMetadata) {
-			info := metadata.Info
-			if info.IsDir() {
-				return
-			}
-			sp.Add(&snapshot.FileItem{FullPath: metadata.Path})
-		})
+	err := fs.Walk(".", func(walkResult *fs.WalkResult) {
+		if walkResult.Err != nil {
+			glog.Fatalf("unexpected error: %v.", walkResult.Err)
+		}
+		sp.Add(&snapshot.FileItem{FullPath: walkResult.Path})
+	})
 
 	if err != nil {
 		glog.Fatalf("unexpected error: %v", err)
