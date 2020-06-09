@@ -20,5 +20,5 @@ type CmdType int
 const (
 	CmdUnspecified CmdType = iota
 	CmdNew
-	CmdDelete
+	CmdDel
 )

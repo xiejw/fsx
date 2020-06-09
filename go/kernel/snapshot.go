@@ -2,8 +2,10 @@ package kernel
 
 import (
 	"fmt"
+	"path"
 
 	"github.com/golang/glog"
+	"github.com/xiejw/fsx/go/cmdlog"
 	"github.com/xiejw/fsx/go/fs"
 	"github.com/xiejw/fsx/go/snapshot"
 )
@@ -36,5 +38,34 @@ func FetchSnapshotFromFileTree(baseDir string) (snapshot.Snapshot, error) {
 	return sp, nil
 }
 
-func FetchSnapshotFromCmdLogs(cmdLogs bool) {
+func FetchSnapshotFromCmdLogs(cmdLogs []cmdlog.CmdLog) (snapshot.Snapshot, error) {
+	var err error
+	sp := snapshot.New()
+
+	for i, log := range cmdLogs {
+		cmd := log.Cmd
+		switch cmd.Type {
+		case cmdlog.CmdNew:
+			item := &snapshot.FileItem{
+				FullPath: path.Join(cmd.Dir, cmd.FileName),
+				Size:     cmd.Size,
+				Checksum: cmd.Checksum,
+			}
+			err = sp.Add(item)
+			if err != nil {
+				return nil, err
+			}
+		case cmdlog.CmdDel:
+			fullPath := path.Join(cmd.Dir, cmd.FileName)
+			err = sp.Delete(fullPath)
+			if err != nil {
+				return nil, err
+			}
+
+		default:
+			return nil, fmt.Errorf("unsupported cmdlog type at %v: %v", i, cmd.Type)
+		}
+	}
+
+	return sp, nil
 }

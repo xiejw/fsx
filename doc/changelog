@@ -1,6 +1,8 @@
 ## TODO
 
 - create cmdlogs from diff.
+- snapshot from file tree with checksum
+- ignore checksum indiff.
 - use scanner to generate it.
 - marshal cmdlogs
 - driver
