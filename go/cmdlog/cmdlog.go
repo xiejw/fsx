@@ -1,8 +1,9 @@
-package node
+package cmdlog
 
 type CmdLog struct {
 	Version    uint64
 	MasterName string
+	Timestamp  int64
 	Cmd        *Cmd
 }
 

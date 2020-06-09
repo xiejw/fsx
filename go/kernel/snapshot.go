@@ -35,3 +35,6 @@ func FetchSnapshotFromFileTree(baseDir string) (snapshot.Snapshot, error) {
 
 	return sp, nil
 }
+
+func FetchSnapshotFromCmdLogs(cmdLogs bool) {
+}
