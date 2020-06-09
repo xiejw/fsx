@@ -1,32 +1,35 @@
 REPO=fsx
+LIB_DIR=go
+CMD_DIR=cmd
+BUILD_DIR=.build
 
-BUILD=.build
-PACKAGES=github.com/xiejw/${REPO}/go/...
-CMD_PACKAGES=github.com/xiejw/${REPO}/cmd/...
-CMDS=$(patsubst cmd/%,%,$(wildcard cmd/*))
+LIBS=github.com/xiejw/${REPO}/${LIB_DIR}/...
+CMD_LIBS=github.com/xiejw/${REPO}/${CMD_DIR}/...
+CMD_CANDIDATES=$(patsubst cmd/%,%,$(wildcard cmd/*))  # convention is cmd/<binary>/main.go
 
-compile: compile_pkg compile_cmd
+compile: compile_lib compile_cmd
 
-compile_pkg:
-	go build ${PACKAGES}
+compile_lib:
+	go build ${LIBS}
 
 compile_cmd:
-	@mkdir -p ${BUILD}
-	@for cmd in ${CMDS}; do \
-		echo 'compile cmd/'$$cmd && go build -o ${BUILD}/$$cmd cmd/$$cmd/main.go; \
+	@mkdir -p ${BUILD_DIR}
+	@for cmd in ${CMD_CANDIDATES}; do \
+		echo 'compile cmd/'$$cmd && \
+	  go build -o ${BUILD_DIR}/$$cmd cmd/$$cmd/main.go; \
 	done
 
 fmt:
-	go fmt ${PACKAGES}
-	go fmt ${CMD_PACKAGES}
+	go fmt ${LIBS}
+	go fmt ${CMD_LIBS}
 
 test:
-	go test ${PACKAGES}
+	go test ${LIBS}
 
 bench:
-	go test -bench=. ${PACKAGES}
+	go test -bench=. ${LIBS}
 
 clean:
 	go mod tidy
-	@echo 'clean' ${BUILD} && rm -rf ${BUILD}
+	@echo "clean '"${BUILD_DIR}"'" && rm -rf ${BUILD_DIR}
 
