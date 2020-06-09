@@ -1,5 +1,6 @@
 ## TODO
 
+- make snapshot immutable
 - create cmdlogs from diff.
 - use scanner to generate it.
 - marshal cmdlogs
