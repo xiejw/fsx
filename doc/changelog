@@ -1,6 +1,5 @@
 ## TODO
 
-- make snapshot immutable
 - create cmdlogs from diff.
 - use scanner to generate it.
 - marshal cmdlogs
@@ -9,6 +8,7 @@
 
 ## Logs
 
+2020-06-09 made snapshot immutable, added kernel.
 2020-06-07 added diff snapshot.
 2020-06-07 added snapshot and one impl.
 2020-06-07 moved scanner lib to lunar repo.

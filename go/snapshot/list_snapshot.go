@@ -9,7 +9,7 @@ type ListSnapshot struct {
 	holes []int          // Stores the hole index in array.
 }
 
-func New() Snapshot {
+func New() SnapshotBuilder {
 	return &ListSnapshot{
 		array: make([]*FileItem, 0),
 		index: make(map[string]int),

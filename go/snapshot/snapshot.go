@@ -21,7 +21,12 @@ type Iterator interface {
 // Represents a snaptshot of the current system.
 type Snapshot interface {
 	LookUp(fullPath string) *FileItem // Returns nil for not exist.
+	Iterator() Iterator
+}
+
+type SnapshotBuilder interface {
+	Snapshot
+
 	Add(*FileItem) error
 	Delete(fullPath string) error
-	Iterator() Iterator
 }
