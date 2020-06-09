@@ -34,7 +34,7 @@ func TestCheckPassed(t *testing.T) {
 			{
 				Version:    0,
 				MasterName: "test_node",
-				Cmd:        &Cmd{CmdNew, "", "test_file_1", []byte("abc")},
+				Cmd:        &Cmd{CmdNew, "", "test_file_1", 123, []byte("abc")},
 			},
 		},
 	}
@@ -51,7 +51,7 @@ func TestCheckFailedWithNextVersion(t *testing.T) {
 			{
 				Version:    0,
 				MasterName: "test_node",
-				Cmd:        &Cmd{CmdNew, "", "test_file_1", []byte("abc")},
+				Cmd:        &Cmd{CmdNew, "", "test_file_1", 123, []byte("abc")},
 			},
 		},
 	}
@@ -68,7 +68,7 @@ func TestCheckFailedWithCmdLogVersion(t *testing.T) {
 			{
 				Version:    1,
 				MasterName: "test_node",
-				Cmd:        &Cmd{CmdNew, "", "test_file_1", []byte("abc")},
+				Cmd:        &Cmd{CmdNew, "", "test_file_1", 123, []byte("abc")},
 			},
 		},
 	}
@@ -85,7 +85,7 @@ func TestMarshal(t *testing.T) {
 			{
 				Version:    0,
 				MasterName: "test_node",
-				Cmd:        &Cmd{CmdNew, "", "test_file_1", []byte("abc")},
+				Cmd:        &Cmd{CmdNew, "", "test_file_1", 123, []byte("abc")},
 			},
 		},
 	}
@@ -107,6 +107,7 @@ func TestMarshal(t *testing.T) {
         "Type": 1,
         "Dir": "",
         "FileName": "test_file_1",
+        "Size": 123,
         "Checksum": "YWJj"
       }
     }
@@ -126,7 +127,7 @@ func TestUnmarshal(t *testing.T) {
 			{
 				Version:    0,
 				MasterName: "test_node",
-				Cmd:        &Cmd{CmdNew, "", "test_file_1", []byte("abc")},
+				Cmd:        &Cmd{CmdNew, "", "test_file_1", 123, []byte("abc")},
 			},
 		},
 	}

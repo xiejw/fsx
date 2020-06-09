@@ -9,7 +9,8 @@ var (
 
 type FileItem struct {
 	FullPath string // Full path, but relative to base dir.
-	Checksum []byte // Could be empty.
+	Size     uint64 // Length in bytes for regular files.
+	Checksum []byte // Optional sha256 checksum.
 }
 
 // Order is not guaranteed.

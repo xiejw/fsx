@@ -1,7 +1,16 @@
 package snapshot
 
-func Diff(lhs, rhs Snapshot) ([]*FileItem, []*FileItem) {
-	var onlyInLhs, onlyInRhs []*FileItem
+type DiffResult struct {
+	OnlyInLhs   bool
+	OnlyInRhs   bool
+	DiffItem    bool
+	Item        *FileItem
+	AnotherItem *FileItem // If DiffItem is true, this points to rhs
+}
+
+// Diffs the snapshots
+func Diff(lhs, rhs Snapshot) []*DiffResult {
+	var diff []*DiffResult
 
 	{
 		iter := lhs.Iterator()
@@ -11,8 +20,19 @@ func Diff(lhs, rhs Snapshot) ([]*FileItem, []*FileItem) {
 				break
 			}
 
-			if rhs.LookUp(item.FullPath) == nil {
-				onlyInLhs = append(onlyInLhs, item)
+			// We only check diff in this pass.
+			rhsItem := rhs.LookUp(item.FullPath)
+			if rhsItem == nil {
+				diff = append(diff, &DiffResult{
+					OnlyInLhs: true,
+					Item:      item,
+				})
+			} else if !isItemEqual(item, rhsItem) {
+				diff = append(diff, &DiffResult{
+					DiffItem:    true,
+					Item:        item,
+					AnotherItem: rhsItem,
+				})
 			}
 		}
 	}
@@ -26,10 +46,40 @@ func Diff(lhs, rhs Snapshot) ([]*FileItem, []*FileItem) {
 			}
 
 			if lhs.LookUp(item.FullPath) == nil {
-				onlyInRhs = append(onlyInRhs, item)
+				diff = append(diff, &DiffResult{
+					OnlyInRhs: true,
+					Item:      item,
+				})
 			}
 		}
 	}
 
-	return onlyInLhs, onlyInRhs
+	return diff
+}
+
+func isItemEqual(lhsItem, rhsItem *FileItem) bool {
+	if lhsItem.Size != rhsItem.Size {
+		return false
+	}
+
+	lhs := lhsItem.Checksum
+	rhs := rhsItem.Checksum
+
+	if lhs == nil && rhs == nil {
+		return true
+	}
+	if (lhs == nil) != (rhs == nil) {
+		return false
+	}
+
+	size := len(lhs)
+	if size != len(rhs) {
+		return false
+	}
+	for i := 0; i < size; i++ {
+		if lhs[i] != rhs[i] {
+			return false
+		}
+	}
+	return true
 }

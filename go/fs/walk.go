@@ -6,6 +6,7 @@ import (
 
 type WalkResult struct {
 	Path string
+	Size uint64
 	Err  error
 }
 
@@ -20,6 +21,7 @@ func Walk(baseDir string, cb func(*WalkResult)) error {
 			}
 			cb(&WalkResult{
 				Path: metadata.Path,
+				Size: uint64(info.Size()),
 				Err:  nil, // No error for local fs.
 			})
 		})

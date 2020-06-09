@@ -19,7 +19,10 @@ func FetchSnapshotFromFileTree(baseDir string) (snapshot.Snapshot, error) {
 			glog.Errorf("unexpected error: %v.", errDuringWalk)
 			return
 		}
-		sp.Add(&snapshot.FileItem{FullPath: walkResult.Path})
+		sp.Add(&snapshot.FileItem{
+			FullPath: walkResult.Path,
+			Size:     walkResult.Size,
+		})
 	})
 
 	if err != nil {

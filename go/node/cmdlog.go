@@ -9,7 +9,8 @@ type CmdLog struct {
 type Cmd struct {
 	Type     CmdType
 	Dir      string // Dir == "" -> root
-	FileName string // Must be file. Cannot be empty.
+	FileName string // Required.
+	Size     uint64 // Must be filled for CmdNew
 	Checksum []byte // Must be filled for CmdNew
 }
 
