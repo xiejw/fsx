@@ -55,3 +55,27 @@ func TestFetchSnapshotFromCmdLogs(t *testing.T) {
 		{"test_file_1", 123, []byte("abc")},
 	}, sp)
 }
+
+func TestFetchSnapshotFromCmdLogsWithDel(t *testing.T) {
+	cmdLogs := []cmdlog.CmdLog{
+		{
+			Version: 0,
+			Cmd: &cmdlog.Cmd{
+				cmdlog.CmdNew, "", "test_file_1", 123, []byte("abc")},
+		},
+		{
+			Version: 1,
+			Cmd: &cmdlog.Cmd{
+				cmdlog.CmdNew, "a", "test_file_2", 456, []byte("def")},
+		},
+		{
+			Version: 2,
+			Cmd:     &cmdlog.Cmd{Type: cmdlog.CmdDel, Dir: "", FileName: "test_file_1"},
+		},
+	}
+	sp, err := FetchSnapshotFromCmdLogs(cmdLogs)
+	assertNoError(t, err)
+	assertSnapshot(t, []*snapshot.FileItem{
+		{"a/test_file_2", 456, []byte("def")},
+	}, sp)
+}
