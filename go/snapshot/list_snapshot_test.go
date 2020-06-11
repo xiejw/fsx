@@ -11,6 +11,13 @@ func assertNoErr(t *testing.T, err error) {
 	}
 }
 
+func assertSize(t *testing.T, expectedSize uint64, sp Snapshot) {
+	t.Helper()
+	if expectedSize != sp.Size() {
+		t.Fatalf("unepxected size: expected: %v, got: %v", expectedSize, sp.Size())
+	}
+}
+
 // Asserts that items in sp are matching the list of `expected`.
 func assertSnapshot(t *testing.T, expected []string, sp Snapshot) {
 	t.Helper()
@@ -45,6 +52,7 @@ func TestAdd(t *testing.T) {
 	assertNoErr(t, err)
 
 	assertSnapshot(t, []string{"dir/a"}, sp)
+	assertSize(t, 1, sp)
 }
 
 func TestAddDup(t *testing.T) {
@@ -57,6 +65,32 @@ func TestAddDup(t *testing.T) {
 	if err != ErrItemAlreadyExist {
 		t.Errorf("error mismatches.")
 	}
+	assertSize(t, 1, sp)
+}
+
+func TestAddWithSameChecksumState(t *testing.T) {
+	var err error
+	sp := New()
+	err = sp.Add(&FileItem{FullPath: "dir/a", Checksum: []byte("ab")})
+	assertNoErr(t, err)
+
+	err = sp.Add(&FileItem{FullPath: "dir/b", Checksum: []byte("ab")})
+	assertNoErr(t, err)
+
+	assertSize(t, 2, sp)
+}
+
+func TestAddWithChecksumStateDifferent(t *testing.T) {
+	var err error
+	sp := New()
+	err = sp.Add(&FileItem{FullPath: "dir/a"})
+	assertNoErr(t, err)
+
+	err = sp.Add(&FileItem{FullPath: "dir/b", Checksum: []byte("ab")})
+	if err != ErrChecksumMismatch {
+		t.Errorf("error mismatches.")
+	}
+	assertSize(t, 1, sp)
 }
 
 func TestDelete(t *testing.T) {
@@ -70,6 +104,7 @@ func TestDelete(t *testing.T) {
 	assertNoErr(t, err)
 
 	assertSnapshot(t, []string{}, sp)
+	assertSize(t, 0, sp)
 }
 
 func TestDeleteNotExist(t *testing.T) {

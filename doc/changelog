@@ -1,6 +1,5 @@
 ## TODO
 
-- add test for haschecksum
 - define diff operation on haskchecksum.
 - create cmdlogs from diff.
 - snapshot from file tree with checksum
@@ -12,6 +11,7 @@
 
 ## Logs
 
+2020-06-10 made snapshot tracking hasChecksum.
 2020-06-09 made snapshot immutable, added kernel.
 2020-06-07 added diff snapshot.
 2020-06-07 added snapshot and one impl.
