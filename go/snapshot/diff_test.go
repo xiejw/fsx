@@ -103,3 +103,37 @@ func TestDiffWithMetaData(t *testing.T) {
 		map[string]bool{"dir/b": true, "dir/f": true},
 		results)
 }
+
+func TestDiffWithDifferentChecksumStates(t *testing.T) {
+	var err error
+	lhs := New()
+
+	err = lhs.Add(&FileItem{FullPath: "dir/a", Size: 123})
+	assertNoErr(t, err)
+	err = lhs.Add(&FileItem{FullPath: "dir/b"})
+	assertNoErr(t, err)
+	err = lhs.Add(&FileItem{FullPath: "dir/f", Size: 123})
+	assertNoErr(t, err)
+	if lhs.HasChecksum() {
+		t.Fatalf("haschecksum should be false.")
+	}
+
+	rhs := New()
+	err = rhs.Add(&FileItem{FullPath: "dir/a", Size: 123, Checksum: []byte{'1', '2'}})
+	assertNoErr(t, err)
+	err = rhs.Add(&FileItem{FullPath: "dir/b", Checksum: []byte{'7', '2'}})
+	assertNoErr(t, err)
+	err = rhs.Add(&FileItem{FullPath: "dir/f", Size: 456, Checksum: []byte{'1', '2'}})
+	assertNoErr(t, err)
+	if !rhs.HasChecksum() {
+		t.Fatalf("haschecksum should be false.")
+	}
+
+	// "dir/b" is considered has idential as the HasChecksum() are not true for both.
+	results := Diff(lhs, rhs)
+	assertDiffResults(t,
+		map[string]bool{},
+		map[string]bool{},
+		map[string]bool{"dir/f": true},
+		results)
+}

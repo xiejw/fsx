@@ -8,9 +8,13 @@ type DiffResult struct {
 	AnotherItem *FileItem // If DiffItem is true, this points to rhs
 }
 
-// Diffs the snapshots
+// Diffs the snapshots.
+//
+// This method compares Checksum field of Snapshot if and only if both lhs and rhs HasChecksum.
 func Diff(lhs, rhs Snapshot) []*DiffResult {
 	var diff []*DiffResult
+
+	checkChecksum := lhs.HasChecksum() && rhs.HasChecksum()
 
 	{
 		iter := lhs.Iterator()
@@ -27,7 +31,7 @@ func Diff(lhs, rhs Snapshot) []*DiffResult {
 					OnlyInLhs: true,
 					Item:      item,
 				})
-			} else if !isItemEqual(item, rhsItem) {
+			} else if !isItemEqual(item, rhsItem, checkChecksum) {
 				diff = append(diff, &DiffResult{
 					DiffItem:    true,
 					Item:        item,
@@ -57,9 +61,13 @@ func Diff(lhs, rhs Snapshot) []*DiffResult {
 	return diff
 }
 
-func isItemEqual(lhsItem, rhsItem *FileItem) bool {
+func isItemEqual(lhsItem, rhsItem *FileItem, checkChecksum bool) bool {
 	if lhsItem.Size != rhsItem.Size {
 		return false
+	}
+
+	if !checkChecksum {
+		return true
 	}
 
 	lhs := lhsItem.Checksum
