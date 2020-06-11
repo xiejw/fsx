@@ -4,9 +4,11 @@ package snapshot
 //
 // Internally, a map is created to speed up the LookUp.
 type ListSnapshot struct {
-	array []*FileItem    // nil is the hole.
-	index map[string]int // Index the path to array index.
-	holes []int          // Stores the hole index in array.
+	size        uint64         // size of items.
+	array       []*FileItem    // nil is the hole.
+	index       map[string]int // Index the path to array index.
+	holes       []int          // Stores the hole index in array.
+	hasChecksum bool           // The state of hasChecksum for all items.
 }
 
 func New() SnapshotBuilder {
@@ -15,6 +17,14 @@ func New() SnapshotBuilder {
 		index: make(map[string]int),
 		holes: make([]int, 0),
 	}
+}
+
+func (sp *ListSnapshot) HasChecksum() bool {
+	return sp.hasChecksum
+}
+
+func (sp *ListSnapshot) Size() uint64 {
+	return sp.size
 }
 
 func (sp *ListSnapshot) LookUp(fullPath string) *FileItem {
@@ -32,7 +42,16 @@ func (sp *ListSnapshot) Add(item *FileItem) error {
 		return ErrItemAlreadyExist
 	}
 
-	// First find the avaiable hole.
+	// Check the invariance of the `hasChecksum`.
+	itemHasChecksum := len(item.Checksum) != 0
+	if sp.size == 0 {
+		sp.hasChecksum = itemHasChecksum
+	} else if sp.hasChecksum != itemHasChecksum {
+		return ErrChecksumMismatch
+	}
+
+	// Find the avaiable hole first.
+	sp.size++
 	count := len(sp.holes)
 	if count != 0 {
 		holeIndex := sp.holes[count-1]
@@ -61,6 +80,7 @@ func (sp *ListSnapshot) Delete(fullPath string) error {
 
 	// Put the index to holes
 	sp.holes = append(sp.holes, deletedIndex)
+	sp.size--
 	return nil
 }
 

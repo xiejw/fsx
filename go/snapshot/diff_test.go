@@ -81,19 +81,19 @@ func TestDiffWithMetaData(t *testing.T) {
 	var err error
 	lhs := New()
 
-	err = lhs.Add(&FileItem{FullPath: "dir/a", Size: 123})
+	err = lhs.Add(&FileItem{FullPath: "dir/a", Size: 123, Checksum: []byte{'1', '2'}})
 	assertNoErr(t, err)
 	err = lhs.Add(&FileItem{FullPath: "dir/b", Checksum: []byte{'1', '2'}})
 	assertNoErr(t, err)
-	err = lhs.Add(&FileItem{FullPath: "dir/f", Size: 123})
+	err = lhs.Add(&FileItem{FullPath: "dir/f", Size: 123, Checksum: []byte{'1', '2'}})
 	assertNoErr(t, err)
 
 	rhs := New()
-	err = rhs.Add(&FileItem{FullPath: "dir/a", Size: 123})
+	err = rhs.Add(&FileItem{FullPath: "dir/a", Size: 123, Checksum: []byte{'1', '2'}})
 	assertNoErr(t, err)
 	err = rhs.Add(&FileItem{FullPath: "dir/b", Checksum: []byte{'7', '2'}})
 	assertNoErr(t, err)
-	err = rhs.Add(&FileItem{FullPath: "dir/f", Size: 456})
+	err = rhs.Add(&FileItem{FullPath: "dir/f", Size: 456, Checksum: []byte{'1', '2'}})
 	assertNoErr(t, err)
 
 	results := Diff(lhs, rhs)

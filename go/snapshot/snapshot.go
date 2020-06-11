@@ -5,6 +5,7 @@ import "errors"
 var (
 	ErrItemNotExist     = errors.New("item not exist.")
 	ErrItemAlreadyExist = errors.New("item already exist.")
+	ErrChecksumMismatch = errors.New("snapshot checksum state mismatch.")
 )
 
 type FileItem struct {
@@ -21,10 +22,13 @@ type Iterator interface {
 // Represents a snaptshot of the current system.
 type Snapshot interface {
 	LookUp(fullPath string) *FileItem // Returns nil for not exist.
-	Size() uint64 // Num of FileItem.
-	Iterator() Iterator // Returns a one-off iterator.
+	Size() uint64                     // Num of FileItem.
+	Iterator() Iterator               // Returns a one-off iterator.
 
-	// All FileItems in the Snapshot must all have Checksum
+	// All FileItems in the Snapshot must all have Checksums or none of them have.
+	// Partial is not allowed.
+	//
+	// If Size() == 0, this has no meaning.
 	HasChecksum() bool
 }
 
