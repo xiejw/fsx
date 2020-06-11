@@ -1,5 +1,7 @@
 ## TODO
 
+- add test for haschecksum
+- define diff operation on haskchecksum.
 - create cmdlogs from diff.
 - snapshot from file tree with checksum
 - ignore checksum indiff.
