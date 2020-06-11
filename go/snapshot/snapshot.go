@@ -10,7 +10,7 @@ var (
 type FileItem struct {
 	FullPath string // Full path, but relative to base dir.
 	Size     uint64 // Length in bytes for regular files.
-	Checksum []byte // Optional sha256 checksum.
+	Checksum []byte // Optional sha256 checksum. See Snapshot interface for requirement.
 }
 
 // Order is not guaranteed.
@@ -21,7 +21,11 @@ type Iterator interface {
 // Represents a snaptshot of the current system.
 type Snapshot interface {
 	LookUp(fullPath string) *FileItem // Returns nil for not exist.
-	Iterator() Iterator
+	Size() uint64 // Num of FileItem.
+	Iterator() Iterator // Returns a one-off iterator.
+
+	// All FileItems in the Snapshot must all have Checksum
+	HasChecksum() bool
 }
 
 type SnapshotBuilder interface {
