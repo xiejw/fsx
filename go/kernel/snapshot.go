@@ -38,7 +38,7 @@ func FetchSnapshotFromFileTree(baseDir string) (snapshot.Snapshot, error) {
 	return sp, nil
 }
 
-func FetchSnapshotFromCmdLogs(cmdLogs []cmdlog.CmdLog) (snapshot.Snapshot, error) {
+func FetchSnapshotFromCmdLogs(cmdLogs cmdlog.CmdLogs) (snapshot.Snapshot, error) {
 	var err error
 	sp := snapshot.New()
 

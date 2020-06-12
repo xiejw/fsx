@@ -29,7 +29,7 @@ const (
 
 // Performs sanitys check on the CmdLogs.
 func (logs CmdLogs) Check() error {
-	for i, cmdLog := range []CmdLog(logs) {
+	for i, cmdLog := range logs {
 		if cmdLog.Version != uint64(i) {
 			return fmt.Errorf("at position %v, the CmdLog version is not right: %v.",
 				i, cmdLog.Version)
