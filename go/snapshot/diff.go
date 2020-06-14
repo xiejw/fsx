@@ -10,8 +10,9 @@ type DiffResult struct {
 
 // Diffs the snapshots.
 //
-// This method compares Checksum field of Snapshot if and only if both lhs and rhs HasChecksum.
-func Diff(lhs, rhs Snapshot) []*DiffResult {
+// This method compares Checksum field of Snapshot if and only if both lhs and rhs HasChecksum.  To
+// ensure this is not ignored, the second return value reminds the call site this fact.
+func Diff(lhs, rhs Snapshot) ([]*DiffResult, bool) {
 	var diff []*DiffResult
 
 	checkChecksum := lhs.HasChecksum() && rhs.HasChecksum()
@@ -58,7 +59,7 @@ func Diff(lhs, rhs Snapshot) []*DiffResult {
 		}
 	}
 
-	return diff
+	return diff, checkChecksum
 }
 
 func isItemEqual(lhsItem, rhsItem *FileItem, checkChecksum bool) bool {
