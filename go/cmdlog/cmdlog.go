@@ -5,18 +5,19 @@ import "fmt"
 type CmdLogs []CmdLog
 
 type CmdLog struct {
-	Version    uint64
-	MasterName string
-	Timestamp  int64
-	Cmd        *Cmd
+	Version     uint64 // version of the log.
+	MasterName  string // name of the master node.
+	Timestamp   int64  // seconds since epoch.
+	LogChecksum []byte // checksum of the cmdlog.
+	Cmd         *Cmd
 }
 
 type Cmd struct {
-	Type     CmdType
-	Dir      string // Dir == "" -> root
-	FileName string // Required.
-	Size     uint64 // Must be filled for CmdNew
-	Checksum []byte // Must be filled for CmdNew
+	Type     CmdType // cannot be unspecified.
+	Dir      string  // empty string ("") means root dir.
+	FileName string  // required.
+	Size     uint64  // required for CmdNew.
+	Checksum []byte  // required for CmdNew.
 }
 
 type CmdType int

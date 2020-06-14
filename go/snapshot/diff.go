@@ -15,7 +15,7 @@ type DiffResult struct {
 func Diff(lhs, rhs Snapshot) ([]*DiffResult, bool) {
 	var diff []*DiffResult
 
-	checkChecksum := lhs.HasChecksum() && rhs.HasChecksum()
+	compareChecksum := lhs.HasChecksum() && rhs.HasChecksum()
 
 	{
 		iter := lhs.Iterator()
@@ -32,7 +32,7 @@ func Diff(lhs, rhs Snapshot) ([]*DiffResult, bool) {
 					OnlyInLhs: true,
 					Item:      item,
 				})
-			} else if !isItemEqual(item, rhsItem, checkChecksum) {
+			} else if !isItemEqual(item, rhsItem, compareChecksum) {
 				diff = append(diff, &DiffResult{
 					DiffItem:    true,
 					Item:        item,
@@ -59,15 +59,15 @@ func Diff(lhs, rhs Snapshot) ([]*DiffResult, bool) {
 		}
 	}
 
-	return diff, checkChecksum
+	return diff, compareChecksum
 }
 
-func isItemEqual(lhsItem, rhsItem *FileItem, checkChecksum bool) bool {
+func isItemEqual(lhsItem, rhsItem *FileItem, compareChecksum bool) bool {
 	if lhsItem.Size != rhsItem.Size {
 		return false
 	}
 
-	if !checkChecksum {
+	if !compareChecksum {
 		return true
 	}
 
