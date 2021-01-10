@@ -1,11 +1,12 @@
-REPO=fsx
-LIB_DIR=go
-CMD_DIR=cmd
-BUILD_DIR=.build
+REPO      = fsx
+LIB_DIR   = src
+CMD_DIR   = cmd
+BUILD_DIR = .build
 
-LIBS=github.com/xiejw/${REPO}/${LIB_DIR}/...
-CMD_LIBS=github.com/xiejw/${REPO}/${CMD_DIR}/...
-CMD_CANDIDATES=$(patsubst cmd/%,%,$(wildcard cmd/*))  # convention is cmd/<binary>/main.go
+LIBS      = github.com/xiejw/${REPO}/${LIB_DIR}/...
+CMD_LIBS  = github.com/xiejw/${REPO}/${CMD_DIR}/...
+# convention is cmd/<binary>/main.go
+CMD_CANDS = $(patsubst cmd/%,%,$(wildcard cmd/*))
 
 compile: compile_lib compile_cmd
 
@@ -14,7 +15,7 @@ compile_lib:
 
 compile_cmd:
 	@mkdir -p ${BUILD_DIR}
-	@for cmd in ${CMD_CANDIDATES}; do \
+	@for cmd in ${CMD_CANDS}; do \
 		echo 'compile cmd/'$$cmd && \
 	  go build -o ${BUILD_DIR}/$$cmd cmd/$$cmd/main.go; \
 	done
@@ -25,9 +26,6 @@ fmt:
 
 test:
 	go test ${LIBS}
-
-bench:
-	go test -bench=. ${LIBS}
 
 clean:
 	go mod tidy
