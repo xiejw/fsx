@@ -7,4 +7,3 @@ import (
 func main() {
 	fmt.Printf("snapshot\n")
 }
-
