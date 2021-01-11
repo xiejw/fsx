@@ -11,7 +11,9 @@ BUILD_DIR = .build
 # ------------------------------------------------------------------------------
 
 GO    = ${QUIET_GO} go build
+LD    = ${QUIET_LD} go build
 EX    = ${QUIET_EX}
+TS    = go test
 FM    = go fmt
 
 CCCOLOR   = "\033[34m"
@@ -24,15 +26,18 @@ ENDCOLOR  = "\033[0m"
 ifndef V
 QUIET_GO  = @printf '    %b %b\n' $(CCCOLOR)GO$(ENDCOLOR) \
           $(SRCCOLOR)$@$(ENDCOLOR) 1>&2;
+QUIET_LD  = @printf '    %b %b\n' $(LINKCOLOR)LD$(ENDCOLOR) \
+          $(BINCOLOR)`basename $@`$(ENDCOLOR) 1>&2;
 QUIET_EX  = @printf '    %b %b\n' $(LINKCOLOR)EX$(ENDCOLOR) \
           $(BINCOLOR)$@$(ENDCOLOR) 1>&2;
+
+TS        := @sh -c 'printf "    %b %b\n" $(LINKCOLOR)TS $(ENDCOLOR)$(BINCOLOR)"$$1"$(ENDCOLOR) 1>&2; ${TS} "$$1"' sh
 FM        := @sh -c 'printf "    %b %b\n" $(LINKCOLOR)FM $(ENDCOLOR)$(BINCOLOR)"$$1"$(ENDCOLOR) 1>&2; ${FM} "$$1"' sh
 endif
 
 LIBS      = github.com/xiejw/${REPO}/${LIB_DIR}/...
 CMD_LIBS  = github.com/xiejw/${REPO}/${CMD_DIR}/...
-# convention is cmd/<binary>/main.go
-CMD_CANDS = $(patsubst cmd/%,%,$(wildcard cmd/*))
+CMD_CANDS = $(patsubst cmd/%,${BUILD_DIR}/%,$(wildcard cmd/*))
 
 compile: ${BUILD_DIR} compile_lib compile_cmd
 
@@ -44,21 +49,20 @@ compile_lib: ${LIBS}
 ${LIBS}:
 	${GO} ${LIBS}
 
-compile_cmd: ${CMD_CANDS}
+compile_cmd: ${BUILD_DIR} ${CMD_CANDS}
 
-	#@for cmd in ${CMD_CANDS}; do \
-	#	echo 'compile cmd/'$$cmd && \
-	#  ${GO} -o ${BUILD_DIR}/$$cmd cmd/$$cmd/main.go; \
-	#done
+# convention is cmd/<binary>/main.go
+${BUILD_DIR}/%: cmd/%/main.go
+	${LD} -o $@ $<;
 
 fmt:
 	${FM} ${LIBS}
 	${FM} ${CMD_LIBS}
 
 test:
-	go test ${LIBS}
+	${TS} ${LIBS}
 
 clean:
-	go mod tidy
-	@echo "clean '"${BUILD_DIR}"'" && rm -rf ${BUILD_DIR}
+	#go mod tidy
+	rm -rf ${BUILD_DIR}
 
