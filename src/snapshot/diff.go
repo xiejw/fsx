@@ -1,7 +1,5 @@
 package snapshot
 
-import "fmt"
-
 // Myer's diff algorithm.
 func Diff(lhs, rhs *Region) int {
 	lItems := lhs.Items
@@ -15,7 +13,7 @@ func Diff(lhs, rhs *Region) int {
 	var x int
 	var y int
 
-	V := make([]int, 2*maxD+1)
+	V := make([]int, 2*maxD+1) // zeros all. in paper only V[1+offset] is needed.
 
 	for d := 0; d <= maxD; d++ {
 		for k := -d; k <= d; k += 2 {
@@ -27,8 +25,8 @@ func Diff(lhs, rhs *Region) int {
 			}
 			y = x - k
 
-			// follow snake
-			for x < n && y < m && lItems[x+1].RelPath == rItems[y+1].RelPath { // Use eq
+			// follow snake. different from paper, items are zero-index based.
+			for x < n && y < m && lItems[x].RelPath == rItems[y].RelPath { // Use eq
 				x++
 				y++
 			}
@@ -37,7 +35,6 @@ func Diff(lhs, rhs *Region) int {
 
 			// check for solution
 			if x >= n && y >= m {
-				fmt.Printf("len is %v\n", d)
 				return d
 			}
 		}
