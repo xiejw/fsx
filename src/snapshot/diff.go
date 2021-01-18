@@ -2,6 +2,11 @@ package snapshot
 
 // Myer's diff algorithm.
 func Diff(lhs, rhs *Region) int {
+	return shortestEditSequence(lhs, rhs)
+}
+
+// Returns the shortest edit sequence that converts lhs into rhs.
+func shortestEditSequence(lhs, rhs *Region) int {
 	lItems := lhs.Items
 	rItems := rhs.Items
 	n := len(lItems)
@@ -17,11 +22,10 @@ func Diff(lhs, rhs *Region) int {
 
 	for d := 0; d <= maxD; d++ {
 		for k := -d; k <= d; k += 2 {
-			// down or right?
 			if k == -d || (k != d && V[k-1+offset] < V[k+1+offset]) {
-				x = V[k+1+offset]
+				x = V[k+1+offset] // down
 			} else {
-				x = V[k-1+offset] + 1
+				x = V[k-1+offset] + 1 // right
 			}
 			y = x - k
 

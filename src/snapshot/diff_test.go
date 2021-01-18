@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestDiffEquality(t *testing.T) {
+func TestDiffLenEquality(t *testing.T) {
 	lhs := Region{
 		Items: []*FileItem{
 			&FileItem{
@@ -32,7 +32,7 @@ func TestDiffEquality(t *testing.T) {
 	}
 }
 
-func TestDiffMoreinLhs(t *testing.T) {
+func TestDiffLenMoreinLhs(t *testing.T) {
 	lhs := Region{
 		Items: []*FileItem{
 			&FileItem{
@@ -66,7 +66,7 @@ func TestDiffMoreinLhs(t *testing.T) {
 	}
 }
 
-func TestDiffMoreinRhs(t *testing.T) {
+func TestDiffLenMoreinRhs(t *testing.T) {
 	lhs := Region{
 		Items: []*FileItem{
 			&FileItem{
