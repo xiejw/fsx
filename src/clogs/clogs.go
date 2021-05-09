@@ -20,6 +20,6 @@ type CmdLog struct {
 }
 
 type CmdLogs struct {
-	Cmds      []CmdLog
+	Cmds      []*CmdLog
 	VersionID int // same as len(Cmds)
 }

@@ -1,6 +1,9 @@
 package fs
 
 import (
+	"sort"
+
+	"github.com/xiejw/fsx/src/clogs"
 	"github.com/xiejw/fsx/src/errors"
 	"github.com/xiejw/fsx/src/fs/scanner"
 )
@@ -25,6 +28,19 @@ type FileTree struct {
 // creates a FileTree by walking the baseDir.
 func FromLocalFS(baseDir string) (*FileTree, error) {
 	return fromLocalFS(baseDir, scanner.Walk)
+}
+
+// creates a FileTree by replaying cmds in CmdLogs.
+func FromCmdLogs(baseDir string, clgs *clogs.CmdLogs) (*FileTree, error) {
+	items, err := fromCmdLogs(baseDir, clgs)
+	if err != nil {
+		return nil, err
+	}
+	return &FileTree{
+		BaseDir:     baseDir,
+		HasChecksum: true,
+		Items:       items,
+	}, nil
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -59,4 +75,66 @@ func fromLocalFS(baseDir string, walkFn func(baseDir string, filters []scanner.F
 	ft.Items = items
 
 	return ft, nil
+}
+
+// conform sort pkg
+type fileItems []*FileItem
+
+func (a fileItems) Len() int           { return len(a) }
+func (a fileItems) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a fileItems) Less(i, j int) bool { return a[i].Path < a[j].Path }
+
+func fromCmdLogs(baseDir string, clgs *clogs.CmdLogs) ([]*FileItem, error) {
+	maps := make(map[string]*FileItem)
+	// stage 1: replay all cmds.
+	for i, cmd := range clgs.Cmds {
+		cfi := cmd.FileItem
+		path := cfi.Path
+		if path == "" {
+			return nil, errors.New("the %v-th item should be empty path.", i)
+		}
+
+		item, existed := maps[path]
+
+		switch cmd.Kind {
+		case clogs.CmdNew:
+			if existed {
+				return nil, errors.New("the %v-th item should NOT be existed by replaying. path: %v", i, path)
+			}
+
+			fi := &FileItem{
+				Path:     path,
+				Size:     cfi.Size,
+				Checksum: cfi.Checksum,
+			}
+			maps[path] = fi
+
+		case clogs.CmdDel:
+			if !existed {
+				return nil, errors.New("the %v-th item should be existed by replaying. path: %v", i, path)
+			}
+
+			if item.Size != cfi.Size {
+				return nil, errors.New("the %v-th item signature does not match.", i)
+			}
+			if item.Checksum != cfi.Checksum {
+				return nil, errors.New("the %v-th item signature does not match.", i)
+			}
+
+			delete(maps, path)
+
+		default:
+			return nil, errors.New("unknown clogs Cmd Kind: %v", cmd.Kind)
+		}
+	}
+
+	// stage 2: add results into items and then sort.
+	items := make([]*FileItem, 0, len(maps))
+	for _, fi := range maps {
+		items = append(items, fi)
+	}
+
+	sort.Sort(fileItems(items))
+
+	return items, nil
 }

@@ -31,7 +31,7 @@ func TestFileItemStructSameAsCLogsFileItem(t *testing.T) {
 	}
 }
 
-func TestWalk(t *testing.T) {
+func TestFromWalk(t *testing.T) {
 	walkFn := func(baseDir string, filters []scanner.Filter, formatter scanner.Formatter) error {
 		metadata := scanner.FileMetadata{
 			Path: "a",
@@ -66,6 +66,43 @@ func TestWalk(t *testing.T) {
 	expected := []*FileItem{
 		{"b", 123, ""},
 		{"c", 456, ""},
+	}
+
+	if !reflect.DeepEqual(ft.Items, expected) {
+		t.Errorf("unexpected items state. expected:\n%+v\ngot:\n%+v\n", expected, ft.Items)
+	}
+}
+
+func TestFromCLogs(t *testing.T) {
+	clgs := &clogs.CmdLogs{
+		Cmds: []*clogs.CmdLog{
+			{clogs.CmdNew, clogs.FileItem{"c", 5, "0xb"}, 0},
+			{clogs.CmdNew, clogs.FileItem{"bc", 3, "0xc"}, 0},
+			{clogs.CmdNew, clogs.FileItem{"b/c", 2, "0xb"}, 0},
+			{clogs.CmdNew, clogs.FileItem{"a/b", 1, "0x1"}, 0},
+			{clogs.CmdDel, clogs.FileItem{"a/b", 1, "0x1"}, 0},
+			{clogs.CmdNew, clogs.FileItem{"a/b", 4, "0x1"}, 0},
+			{clogs.CmdDel, clogs.FileItem{"c", 5, "0xb"}, 0},
+		},
+	}
+
+	ft, err := FromCmdLogs("abc", clgs)
+	if err != nil {
+		t.Fatalf("unexpected err: %v", err)
+	}
+
+	if ft.BaseDir != "abc" {
+		t.Errorf("unexpected basedir: %v", err)
+	}
+
+	if !ft.HasChecksum {
+		t.Errorf("unexpected checksum state.")
+	}
+
+	expected := []*FileItem{
+		{"a/b", 4, "0x1"},
+		{"b/c", 2, "0xb"},
+		{"bc", 3, "0xc"},
 	}
 
 	if !reflect.DeepEqual(ft.Items, expected) {
