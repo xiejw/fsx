@@ -6,19 +6,12 @@ import (
 	"strings"
 )
 
-// Filter is invoked for each entry during the tree walk. Returns true to skip the
-// item passing to formatter.
-//
-// If any of the `filters` returns true for the sub-folder, the entire sub-tree
-// is skipped.
-type Filter func(path string, info os.FileInfo) bool
-
 // Returns true for the following patterns:
 //
 //   - hidden folder or files..
 //   - *.swp file,
 func NewCommonFilter(extsToSkip []string) Filter {
-	// Adds Vim swp ext.
+	// adds vim swp ext.
 	extsToSkip = append(extsToSkip, "swp")
 	dotExtsToSkip := make([]string, 0, len(extsToSkip))
 	for _, ext := range extsToSkip {

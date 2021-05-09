@@ -24,6 +24,13 @@ type FileMetadata struct {
 // A function allowing to have side-effect, typically printing, operating on the `metadata`.
 type Formatter func(metadata FileMetadata)
 
+// Filter is invoked for each entry during the tree walk. Returns true to skip the
+// item passing to formatter.
+//
+// If any of the `filters` returns true for the sub-folder, the entire sub-tree
+// is skipped.
+type Filter func(path string, info os.FileInfo) bool
+
 // Walk walks the file tree recursively rooted at `baseDir` in lexical order.
 //
 // - If none of the `filters` returns true, the file item, including folder, will be passed to
