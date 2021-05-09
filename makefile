@@ -22,18 +22,17 @@ FM = go fmt
 
 # enable verbose cmd by `make V=1`
 ifndef V
+CBLUE   = "\033[34m"
+CHBLUE  = "\033[34;1m"
+CYELL   = "\033[33m"
+CCYAN   = "\033[36;1m"
+CEND    = "\033[0m"
 
-CCCOLOR   = "\033[34m"
-LINKCOLOR = "\033[34;1m"
-SRCCOLOR  = "\033[33m"
-BINCOLOR  = "\033[36;1m"
-ENDCOLOR  = "\033[0m"
-
-GO        := @sh -c 'printf "    %b %b\n" $(CCCOLOR)GO$(ENDCOLOR) $(SRCCOLOR)"$$1"$(ENDCOLOR) 1>&2; ${GO} "$$1"' sh
-LD        := @sh -c 'printf "    %b %b\n" $(LINKCOLOR)LD$(ENDCOLOR) $(BINCOLOR)`basename $$1`$(ENDCOLOR) 1>&2; ${LD} $$*' sh
-EX        := @sh -c 'printf "    %b %b\n\n" $(LINKCOLOR)EX$(ENDCOLOR) $(BINCOLOR)"`basename $$1`"$(ENDCOLOR) 1>&2; ${EX} "$$1"' sh
-TS        := @sh -c 'printf "    %b %b\n\n" $(LINKCOLOR)TS $(ENDCOLOR)$(BINCOLOR)"$$1"$(ENDCOLOR) 1>&2; ${TS} "$$1"' sh
-FM        := @sh -c 'printf "    %b %b\n" $(LINKCOLOR)FM $(ENDCOLOR)$(BINCOLOR)"$$1"$(ENDCOLOR) 1>&2; ${FM} "$$1"' sh
+GO      := @sh -c 'printf "    %b %b\n"   $(CBLUE)GO$(CEND)  $(CYELL)"$$1"$(CEND)            1>&2; ${GO} "$$1"' sh
+LD      := @sh -c 'printf "    %b %b\n"   $(CHBLUE)LD$(CEND) $(CCYAN)`basename $$1`$(CEND)   1>&2; ${LD}  $$* ' sh
+EX      := @sh -c 'printf "    %b %b\n\n" $(CHBLUE)EX$(CEND) $(CCYAN)"`basename $$1`"$(CEND) 1>&2; ${EX} "$$1"' sh
+TS      := @sh -c 'printf "    %b %b\n\n" $(CHBLUE)TS$(CEND) $(CCYAN)"$$1"$(CEND)            1>&2; ${TS} "$$1"' sh
+FM      := @sh -c 'printf "    %b %b\n"   $(CHBLUE)FM$(CEND) $(CCYAN)"$$1"$(CEND)            1>&2; ${FM} "$$1"' sh
 endif
 
 # ------------------------------------------------------------------------------
@@ -42,15 +41,17 @@ endif
 
 compile: ${BUILD_DIR} compile_lib compile_cmd
 
-${BUILD_DIR}:
-	@mkdir -p ${BUILD_DIR}
-
-compile_lib: ${LIBS}
+compile_lib: ${BUILD_DIR} ${LIBS}
 
 compile_cmd: ${BUILD_DIR} ${CMD_CANDS}
 
+${BUILD_DIR}:
+	@mkdir -p ${BUILD_DIR}
+
+.PHONY: ${LIBS}
+
 ${LIBS}:
-	${GO} ${LIBS}
+	${GO} $@
 
 ${BUILD_DIR}/%: cmd/%/main.go  # convention is cmd/<binary>/main.go
 	${LD} $@ $<;
@@ -63,7 +64,7 @@ test:
 	${TS} ${LIBS}
 
 clean:
-	@echo 'cleaning...' && rm -rf ${BUILD_DIR}
+	@echo 'cleaning...' && rm -rf ${BUILD_DIR} && go mod tidy
 
 snapshot: compile_cmd
 	${EX} ${BUILD_DIR}/snapshot
