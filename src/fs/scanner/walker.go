@@ -10,8 +10,19 @@ import (
 	"github.com/xiejw/fsx/src/errors"
 )
 
-// Stubbed for testing.
-var filePathWalk = filepath.Walk
+// -------------------------------------------------------------------------------------------------
+// public
+// -------------------------------------------------------------------------------------------------
+
+// The metadata emitted by Walk.
+type FileMetadata struct {
+	BaseDir string      // The base directory.
+	Path    string      // The relative path (without base directory or leading '/')
+	Info    os.FileInfo // `FileInfo` for the file.
+}
+
+// A function allowing to have side-effect, typically printing, operating on the `metadata`.
+type Formatter func(metadata FileMetadata)
 
 // Walk walks the file tree recursively rooted at `baseDir` in lexical order.
 //
@@ -30,6 +41,13 @@ func Walk(baseDir string, filters []Filter, formatter Formatter) error {
 	realDirPath := mustFollowDirLink(dir)
 	return walkImpl(realDirPath, filters, formatter)
 }
+
+// -------------------------------------------------------------------------------------------------
+// impl
+// -------------------------------------------------------------------------------------------------
+
+// stubbed for testing.
+var filePathWalk = filepath.Walk
 
 func walkImpl(baseDir string, filters []Filter, formatter Formatter) error {
 
