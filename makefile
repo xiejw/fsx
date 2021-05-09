@@ -43,5 +43,7 @@ clean:
 # binaries.
 # ------------------------------------------------------------------------------
 
-snapshot: compile_cmd
+snapshot:
+	@touch cmd/$@/main.go  # force a rebuild
+	@make compile
 	${EX} ${BUILD_DIR}/snapshot
