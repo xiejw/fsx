@@ -7,7 +7,7 @@ import (
 	"github.com/xiejw/fsx/src/clogs"
 )
 
-func TestFileItem(t *testing.T) {
+func TestFileItemStructSameAsCLogsFileItem(t *testing.T) {
 	fi := &FileItem{Path: "afoo", Size: 123, Checksum: "0xabc"}
 	clgs := &clogs.FileItem{}
 
@@ -20,10 +20,10 @@ func TestFileItem(t *testing.T) {
 
 	for i := 0; i < val_1.NumField(); i++ {
 		if val_1.Type().Field(i).Name != val_2.Type().Field(i).Name {
-			t.Errorf("field %v mismatch name.", i)
+			t.Errorf("field %v field name mismatch.", i)
 		}
 		if val_1.Field(i).Kind() != val_2.Field(i).Kind() {
-			t.Errorf("field %v mismatch type.", i)
+			t.Errorf("field %v field type mismatch.", i)
 		}
 	}
 }
