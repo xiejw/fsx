@@ -12,8 +12,8 @@ func TestDiagnosisErrorOutput(t *testing.T) {
 	expected := `
 Diagnosis Error:
   > during stack 1
-   > during stack 2
-    > root 1
+  > during stack 2
+  @ root 1
 `
 
 	got := err.String()
