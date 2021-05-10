@@ -172,5 +172,69 @@ type diffChange struct {
 }
 
 func diff(lhs, rhs []*FileItem, cmp_checksum bool) ([]*diffChange, error) {
-	return nil, nil
+	// A naive algorithrm. Can switch to myer's diff algorithm later, if it is too slow.
+
+	maps_lhs := make(map[string]*FileItem, len(lhs))
+	maps_rhs := make(map[string]*FileItem, len(rhs))
+	df := make([]*diffChange, 0)
+
+	// Stage 1: Push all items from rhs to maps_rhs.
+	for _, fi := range rhs {
+		maps_rhs[fi.Path] = fi
+	}
+	if len(maps_rhs) != len(rhs) {
+		return nil, errors.New("FileTree has duplicated paths, which is not allowed.")
+	}
+
+	// Stage 2: Two tasks in one loop
+	//   1. Push all items from lhs to maps_lhs.
+	//   2. Check see whether lhs has any diff agains maps_rhs.
+	for _, fi := range lhs {
+		path := fi.Path
+		maps_lhs[path] = fi
+
+		fi_rhs, existed := maps_rhs[path]
+		if !existed {
+			df = append(df, &diffChange{lhs: fi})
+			continue
+		}
+
+		// Check they are same.
+		if fi.Size != fi_rhs.Size {
+			df = append(df, &diffChange{lhs: fi, rhs: fi_rhs})
+			continue
+		}
+
+		if cmp_checksum && fi.Checksum != fi_rhs.Checksum {
+			df = append(df, &diffChange{lhs: fi, rhs: fi_rhs})
+			continue
+		}
+	}
+
+	if len(maps_lhs) != len(lhs) {
+		return nil, errors.New("FileTree has duplicated paths, which is not allowed.")
+	}
+
+	// Stage 3: Check see whether rhs has any diff agains maps_lhs.
+	for _, fi := range rhs {
+		path := fi.Path
+
+		fi_lhs, existed := maps_lhs[path]
+		if !existed {
+			df = append(df, &diffChange{rhs: fi})
+			continue
+		}
+
+		// Check they are same.
+		if fi.Size != fi_lhs.Size {
+			df = append(df, &diffChange{lhs: fi_lhs, rhs: fi})
+			continue
+		}
+
+		if cmp_checksum && fi.Checksum != fi_lhs.Checksum {
+			df = append(df, &diffChange{lhs: fi_lhs, rhs: fi})
+			continue
+		}
+	}
+	return df, nil
 }
