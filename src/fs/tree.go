@@ -5,7 +5,7 @@ import (
 
 	"github.com/xiejw/fsx/src/clogs"
 	"github.com/xiejw/fsx/src/errors"
-	"github.com/xiejw/fsx/src/fs/scanner"
+	"github.com/xiejw/fsx/src/fs/internal/scanner"
 )
 
 // -------------------------------------------------------------------------------------------------
