@@ -45,10 +45,9 @@ func FromCmdLogs(baseDir string, clgs *clogs.CmdLogs) (*FileTree, error) {
 
 // steps to convert from src to dst by deleting items in del first, followed by adding items in add.
 func (src *FileTree) ConvertTo(dst *FileTree) (del []*FileItem, add []*FileItem, err error) {
-	cmp_checksum := false
-	if src.HasChecksum && dst.HasChecksum {
-		cmp_checksum = true
-	}
+	// only compare checksum if both exist. useless in other caess.
+	cmp_checksum := src.HasChecksum && dst.HasChecksum
+
 	diffs, err := diff(src.Items, dst.Items, cmp_checksum)
 	if err != nil {
 		return
@@ -67,7 +66,7 @@ func (src *FileTree) ConvertTo(dst *FileTree) (del []*FileItem, add []*FileItem,
 }
 
 // -------------------------------------------------------------------------------------------------
-// impl
+// impl (factory methods to create FileTree)
 // -------------------------------------------------------------------------------------------------
 
 func fromLocalFS(baseDir string, walkFn func(baseDir string, filters []scanner.Filter, formatter scanner.Formatter) error) (*FileTree, error) {
@@ -163,11 +162,15 @@ func fromCmdLogs(baseDir string, clgs *clogs.CmdLogs) ([]*FileItem, error) {
 	return items, nil
 }
 
+// -------------------------------------------------------------------------------------------------
+// impl (diff FileTrees)
+// -------------------------------------------------------------------------------------------------
+
 type diffChange struct {
 	lhs *FileItem // existed only in lhs. if both set, they are diff.
-	rhs *FileItem // existed only in rhs.
+	rhs *FileItem // existed only in rhs. if both set, they are diff.
 }
 
-func diff(lhs, rhs []*FileItem, checksum bool) ([]*diffChange, error) {
+func diff(lhs, rhs []*FileItem, cmp_checksum bool) ([]*diffChange, error) {
 	return nil, nil
 }
