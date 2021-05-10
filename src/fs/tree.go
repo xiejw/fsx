@@ -85,7 +85,8 @@ func (a fileItems) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a fileItems) Less(i, j int) bool { return a[i].Path < a[j].Path }
 
 func fromCmdLogs(baseDir string, clgs *clogs.CmdLogs) ([]*FileItem, error) {
-	maps := make(map[string]*FileItem)
+	maps := make(map[string]*FileItem, len(clgs.Cmds))
+
 	// stage 1: replay all cmds.
 	for i, cmd := range clgs.Cmds {
 		cfi := cmd.FileItem
