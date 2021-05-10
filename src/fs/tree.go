@@ -218,23 +218,11 @@ func diff(lhs, rhs []*FileItem, cmp_checksum bool) ([]*diffChange, error) {
 	// Stage 3: Check see whether rhs has any diff agains maps_lhs.
 	for _, fi := range rhs {
 		path := fi.Path
-
-		fi_lhs, existed := maps_lhs[path]
+		_, existed := maps_lhs[path]
 		if !existed {
 			df = append(df, &diffChange{rhs: fi})
-			continue
 		}
-
-		// Check they are same.
-		if fi.Size != fi_lhs.Size {
-			df = append(df, &diffChange{lhs: fi_lhs, rhs: fi})
-			continue
-		}
-
-		if cmp_checksum && fi.Checksum != fi_lhs.Checksum {
-			df = append(df, &diffChange{lhs: fi_lhs, rhs: fi})
-			continue
-		}
+		// no need to check diff as in stage 2, all are found.
 	}
 	return df, nil
 }

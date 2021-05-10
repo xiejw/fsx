@@ -1,6 +1,7 @@
 package fs
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -110,6 +111,76 @@ func TestFromCLogs(t *testing.T) {
 	}
 }
 
+func TestDiffWoCmpChecksum(t *testing.T) {
+	tree1 := &FileTree{
+		HasChecksum: true,
+		Items: []*FileItem{
+			{"a/c", 9, "0x1"},
+			{"a/b", 4, "0x1"},
+			{"b/c", 2, "0xb"},
+			{"bc", 3, "0xc"},
+		},
+	}
+	tree2 := &FileTree{
+		HasChecksum: false,
+		Items: []*FileItem{
+			{"a/b", 4, ""},
+			{"b/c", 3, ""},
+			{"bc", 3, ""},
+			{"bcd", 6, ""},
+		},
+	}
+
+	del, add, err := tree1.ConvertTo(tree2)
+	if err != nil {
+		t.Fatalf("unexpected err: %v", err)
+	}
+
+	expected_del := []*FileItem{
+		{"a/c", 9, "0x1"},
+		{"b/c", 2, "0xb"},
+	}
+	assertFileItemListEqual(t, "del mismatch.", expected_del, del)
+
+	expected_add := []*FileItem{
+		{"b/c", 3, ""},
+		{"bcd", 6, ""},
+	}
+	assertFileItemListEqual(t, "add mismatch.", expected_add, add)
+}
+
+func TestDiffWCmpChecksum(t *testing.T) {
+	tree1 := &FileTree{
+		HasChecksum: true,
+		Items: []*FileItem{
+			{"a/b", 4, "0x1"},
+			{"b/c", 2, "0xb"},
+		},
+	}
+	tree2 := &FileTree{
+		HasChecksum: true,
+		Items: []*FileItem{
+			{"a/b", 4, "0x2"},
+			{"b/c", 2, "0xb"},
+		},
+	}
+
+	del, add, err := tree1.ConvertTo(tree2)
+	if err != nil {
+		t.Fatalf("unexpected err: %v", err)
+	}
+
+	expected_del := []*FileItem{
+		{"a/b", 4, "0x1"},
+	}
+	assertFileItemListEqual(t, "del mismatch.", expected_del, del)
+
+	expected_add := []*FileItem{
+		{"a/b", 4, "0x2"},
+	}
+	assertFileItemListEqual(t, "add mismatch.", expected_add, add)
+}
+
 // -------------------------------------------------------------------------------------------------
 // helper
 // -------------------------------------------------------------------------------------------------
@@ -139,4 +210,18 @@ func (f *newFileInfo) IsDir() bool {
 }
 func (f *newFileInfo) Sys() interface{} {
 	return nil
+}
+
+func assertFileItemListEqual(t *testing.T, err_msg string, expected, got []*FileItem) {
+	if !reflect.DeepEqual(expected, got) {
+		err_msg += "\nexpected:\n"
+		for _, fi := range expected {
+			err_msg += fmt.Sprintf("  %+v\n", fi)
+		}
+		err_msg += "got:\n"
+		for _, fi := range got {
+			err_msg += fmt.Sprintf("  %+v\n", fi)
+		}
+		t.Fatalf(err_msg)
+	}
 }
