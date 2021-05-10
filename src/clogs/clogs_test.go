@@ -2,6 +2,7 @@ package clogs
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 )
 
@@ -44,4 +45,18 @@ func TestCLogsToLines(t *testing.T) {
 	if expected != got {
 		t.Errorf("string mismatch.\n  expected:\n%v\n  got:\n%v\n", expected, got)
 	}
+}
+
+func TestCLogsFromLines(t *testing.T) {
+	r := strings.NewReader(`
++            5 0xb 1620609633 c
++            3 0xc 1620609634 bc
++            2 0xb 1620609635 b/c
++            1 0x1 1620609635 a/b
+-            1 0x1 1620609636 a/b
++            4 0x1 1620609637 a/b
+-            5 0xb 1620609638 c
+`)
+	_, err := FromLines(r)
+	t.Errorf("%v", err)
 }
