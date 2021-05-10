@@ -44,6 +44,8 @@ func FromCmdLogs(baseDir string, clgs *clogs.CmdLogs) (*FileTree, error) {
 }
 
 // steps to convert from src to dst by deleting items in del first, followed by adding items in add.
+// BaseDir is ignored during comparision. Checksum will be checked if and only if HasChecksum are
+// true for both src and dst.
 func (src *FileTree) ConvertTo(dst *FileTree) (del []*FileItem, add []*FileItem, err error) {
 	// only compare checksum if both exist. useless in other caess.
 	cmp_checksum := src.HasChecksum && dst.HasChecksum
