@@ -1,5 +1,9 @@
 package clogs
 
+import (
+	"fmt"
+)
+
 type FileItem struct {
 	Path     string // relative to domain
 	Size     int64
@@ -22,4 +26,28 @@ type CmdLog struct {
 type CmdLogs struct {
 	Cmds      []*CmdLog
 	VersionID int // same as len(Cmds)
+}
+
+// serialization
+func ToOneLine(clog *CmdLog) string {
+	// re: file size. 12v is larger than 300G, which should be enough, which should be enough
+	// re: epoch. in 200 years later, epoch will need one more char.
+	switch clog.Kind {
+	case CmdNew:
+		return fmt.Sprintf(
+			"+ %12v %v %v %v",
+			clog.FileItem.Size,
+			clog.FileItem.Checksum,
+			clog.Timestamp,
+			clog.FileItem.Path)
+	case CmdDel:
+		return fmt.Sprintf(
+			"- %12v %v %v %v",
+			clog.FileItem.Size,
+			clog.FileItem.Checksum,
+			clog.Timestamp,
+			clog.FileItem.Path)
+	default:
+		panic("unsupported CmdKind.")
+	}
 }
