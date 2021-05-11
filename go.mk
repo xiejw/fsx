@@ -38,3 +38,18 @@ BUILD_DIR = .build
 ${BUILD_DIR}:
 	@mkdir -p ${BUILD_DIR}
 
+
+# ------------------------------------------------------------------------------
+# template to generate go binary rules.
+# ------------------------------------------------------------------------------
+# convention is cmd/<binary>/main.go ${LD} $@ $<;
+define objs
+
+.PHONY: $(2)/$(1)
+
+$(2)/$(1):
+	$$(LD) $$@ cmd/$(1)/main.go
+
+$(1): $(2)/$(1)
+	$$(EX) $(2)/$(1)
+endef

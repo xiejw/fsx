@@ -9,7 +9,8 @@ CMD_DIR   = cmd
 
 LIBS      = github.com/xiejw/${REPO}/${LIB_DIR}/...
 CMDP      = github.com/xiejw/${REPO}/${CMD_DIR}/...
-CMDS      = $(patsubst ${CMD_DIR}/%,${BUILD_DIR}/%,$(wildcard ${CMD_DIR}/*))
+CMDS      = $(patsubst ${CMD_DIR}/%,%,$(wildcard ${CMD_DIR}/*))
+CMDB      = $(patsubst ${CMD_DIR}/%,${BUILD_DIR}/%,$(wildcard ${CMD_DIR}/*))
 
 # ------------------------------------------------------------------------------
 # actions.
@@ -21,13 +22,11 @@ compile: ${BUILD_DIR} compile_lib compile_cmd
 
 compile_lib: ${BUILD_DIR} ${LIBS}
 
-compile_cmd: ${BUILD_DIR} ${CMDS}
+compile_cmd: ${BUILD_DIR} ${CMDB}
 
 ${LIBS}:
 	${GO} $@
 
-${BUILD_DIR}/%: cmd/%/main.go  # convention is cmd/<binary>/main.go
-	${LD} $@ $<;
 
 fmt:
 	${FM} ${LIBS}
@@ -43,7 +42,5 @@ clean:
 # binaries.
 # ------------------------------------------------------------------------------
 
-snapshot:
-	@touch cmd/$@/main.go  # force a rebuild
-	@make compile
-	${EX} ${BUILD_DIR}/snapshot
+$(foreach cmd,$(CMDS),$(eval $(call objs,$(cmd),$(BUILD_DIR))))
+
