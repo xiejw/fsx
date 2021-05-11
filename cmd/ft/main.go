@@ -2,17 +2,22 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path"
 
+	"github.com/xiejw/fsx/src/clogs"
 	"github.com/xiejw/fsx/src/errors"
 	"github.com/xiejw/fsx/src/fs"
 )
+
+var flagClogsFile = "clogs.txt"
 
 // Handles a single domain (filetree).
 func main() {
 	fmt.Printf("Hello Ft.\n")
 
 	rootDir := "."
-	_, err := fetchLocalFS(rootDir)
+	_, err := fetchFtFromLocalDir(rootDir)
 	if err != nil {
 		fmt.Printf("unexpected error: %v", err)
 		return
@@ -22,7 +27,7 @@ func main() {
 // -------------------------------------------------------------------------------------------------
 // impl
 // -------------------------------------------------------------------------------------------------
-func fetchLocalFS(rootDir string) (*fs.FileTree, error) {
+func fetchFtFromLocalDir(rootDir string) (*fs.FileTree, error) {
 	// Prints a local file tree.
 	ft, err := fs.FromLocalFS(rootDir)
 	if err != nil {
@@ -40,6 +45,43 @@ func fetchLocalFS(rootDir string) (*fs.FileTree, error) {
 		}
 	}
 	fmt.Printf("] (%v total items)\n", len(ft.Items))
+
+	return ft, nil
+}
+
+func fetchFtFromClogsFile(rootDir, clogsPath string) (*fs.FileTree, error) {
+	var clgs *clogs.CmdLogs
+
+	absPath := path.Join(rootDir, clogsPath)
+	_, err := os.Stat(absPath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return nil, errors.WrapNote(
+				err, "failed to create file tree by loading clogs file: %s", clogsPath)
+		}
+
+		// empty clgs if fine.
+		clgs = &clogs.CmdLogs{}
+	} else {
+		f, err := os.Open(absPath)
+		if err != nil {
+			return nil, errors.WrapNote(
+				err, "failed to create file tree by loading clogs file: %s", clogsPath)
+		}
+		defer f.Close()
+
+		clgs, err = clogs.FromLines(f)
+		if err != nil {
+			return nil, errors.WrapNote(
+				err, "failed to create file tree by loading clogs file: %s", clogsPath)
+		}
+	}
+
+	ft, err := fs.FromCmdLogs(rootDir, clgs)
+	if err != nil {
+		return nil, errors.WrapNote(
+			err, "failed to create file tree by loading clogs file: %s", clogsPath)
+	}
 
 	return ft, nil
 }
