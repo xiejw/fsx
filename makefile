@@ -16,17 +16,12 @@ CMDB      = $(patsubst ${CMD_DIR}/%,${BUILD_DIR}/%,$(wildcard ${CMD_DIR}/*))
 # actions.
 # ------------------------------------------------------------------------------
 #
-.PHONY: ${LIBS} compile compile_lib compile_cmd
+.PHONY: compile ${LIBS}
 
-compile: ${BUILD_DIR} compile_lib compile_cmd
-
-compile_lib: ${BUILD_DIR} ${LIBS}
-
-compile_cmd: ${BUILD_DIR} ${CMDB}
+compile: ${BUILD_DIR} ${LIBS} ${CMDB}
 
 ${LIBS}:
 	${GO} $@
-
 
 fmt:
 	${FM} ${LIBS}
