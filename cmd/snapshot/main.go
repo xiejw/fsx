@@ -10,7 +10,7 @@ func main() {
 	fmt.Printf("Hello FsX.\n")
 
 	// Prints a local file tree.
-	ft, err := fs.FromLocalFS(".")
+	ft, err := fs.FromLocalFS(".", false)
 	if err != nil {
 		fmt.Printf("unexpected error: %v", err)
 		return

@@ -1,10 +1,13 @@
 package fs
 
 import (
+	"fmt"
+	"path"
 	"sort"
 
 	"github.com/xiejw/fsx/src/clogs"
 	"github.com/xiejw/fsx/src/errors"
+	"github.com/xiejw/fsx/src/fs/internal/crypto"
 	"github.com/xiejw/fsx/src/fs/internal/scanner"
 )
 
@@ -26,8 +29,25 @@ type FileTree struct {
 }
 
 // creates a FileTree by walking the baseDir.
-func FromLocalFS(baseDir string) (*FileTree, error) {
-	return fromLocalFS(baseDir, scanner.Walk)
+func FromLocalFS(baseDir string, checksum bool) (*FileTree, error) {
+	ft, err := fromLocalFS(baseDir, scanner.Walk)
+	if err != nil {
+		return nil, err
+	}
+
+	if checksum {
+		for _, fi := range ft.Items {
+			absPath := path.Join(baseDir, fi.Path)
+			sum, err := crypto.Sha256Sum(absPath)
+			if err != nil {
+				return nil, errors.WrapNote(err, "failed to fetch checksum for file: %v", absPath)
+			}
+			fi.Checksum = fmt.Sprintf("%x", sum)
+		}
+		ft.HasChecksum = true
+	}
+
+	return ft, nil
 }
 
 // creates a FileTree by replaying cmds in CmdLogs.

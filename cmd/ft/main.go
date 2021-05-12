@@ -10,14 +10,17 @@ import (
 	"github.com/xiejw/fsx/src/fs"
 )
 
-var flagClogsFile = "clogs.txt"
+var (
+	flagClogsFile = "clogs.txt"
+	flagChecksum  = true
+)
 
 // Handles a single domain (filetree).
 func main() {
 	fmt.Printf("Hello Ft.\n")
 
 	rootDir := "."
-	ft_local, err := fetchFtFromLocalDir(rootDir)
+	ft_local, err := fetchFtFromLocalDir(rootDir, flagChecksum)
 	if err != nil {
 		fmt.Printf("unexpected error: %v", err)
 		return
@@ -36,9 +39,9 @@ func main() {
 // -------------------------------------------------------------------------------------------------
 // impl
 // -------------------------------------------------------------------------------------------------
-func fetchFtFromLocalDir(rootDir string) (*fs.FileTree, error) {
+func fetchFtFromLocalDir(rootDir string, checksum bool) (*fs.FileTree, error) {
 	// Prints a local file tree.
-	ft, err := fs.FromLocalFS(rootDir)
+	ft, err := fs.FromLocalFS(rootDir, checksum)
 	if err != nil {
 		return nil, errors.WrapNote(err, "failed to fetch local file tree at: %v", rootDir)
 	}
@@ -87,8 +90,14 @@ func printFileTree(startingMsg string, ft *fs.FileTree) {
 	maxItems := 10
 
 	fmt.Printf("FT (%v): %v [\n", startingMsg, ft.BaseDir)
+	checksum := ft.HasChecksum
+
 	for i, it := range ft.Items {
-		fmt.Printf("%10d %v\n", it.Size, it.Path)
+		if checksum {
+			fmt.Printf("%10d %v %v\n", it.Size, it.Checksum, it.Path)
+		} else {
+			fmt.Printf("%10d %v\n", it.Size, it.Path)
+		}
 		if i == maxItems-1 && i != len(ft.Items)-1 {
 			fmt.Printf("       ... (%v items left)\n", len(ft.Items)-maxItems)
 			break
