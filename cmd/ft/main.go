@@ -17,11 +17,20 @@ func main() {
 	fmt.Printf("Hello Ft.\n")
 
 	rootDir := "."
-	_, err := fetchFtFromLocalDir(rootDir)
+	ft_local, err := fetchFtFromLocalDir(rootDir)
 	if err != nil {
 		fmt.Printf("unexpected error: %v", err)
 		return
 	}
+	printFileTree("local", ft_local)
+	Printf("\n")
+
+	ft_clgs, err := fetchFtFromClogsFile(rootDir, flagClogsFile)
+	if err != nil {
+		fmt.Printf("unexpected error: %v", err)
+		return
+	}
+	printFileTree("clogs", ft_clgs)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -33,18 +42,6 @@ func fetchFtFromLocalDir(rootDir string) (*fs.FileTree, error) {
 	if err != nil {
 		return nil, errors.WrapNote(err, "failed to fetch local file tree at: %v", rootDir)
 	}
-
-	maxItems := 10
-
-	fmt.Printf("FT: %v [\n", ft.BaseDir)
-	for i, it := range ft.Items {
-		fmt.Printf("%10d %v\n", it.Size, it.Path)
-		if i == maxItems-1 && i != len(ft.Items)-1 {
-			fmt.Printf("       ... (%v items left)\n", len(ft.Items)-maxItems)
-			break
-		}
-	}
-	fmt.Printf("] (%v total items)\n", len(ft.Items))
 
 	return ft, nil
 }
@@ -84,4 +81,18 @@ func fetchFtFromClogsFile(rootDir, clogsPath string) (*fs.FileTree, error) {
 	}
 
 	return ft, nil
+}
+
+func printFileTree(startingMsg string, ft *fs.FileTree) {
+	maxItems := 10
+
+	fmt.Printf("FT (%v): %v [\n", startingMsg, ft.BaseDir)
+	for i, it := range ft.Items {
+		fmt.Printf("%10d %v\n", it.Size, it.Path)
+		if i == maxItems-1 && i != len(ft.Items)-1 {
+			fmt.Printf("       ... (%v items left)\n", len(ft.Items)-maxItems)
+			break
+		}
+	}
+	fmt.Printf("] (%v total items)\n", len(ft.Items))
 }
