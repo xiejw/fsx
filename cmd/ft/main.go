@@ -23,7 +23,7 @@ func main() {
 		return
 	}
 	printFileTree("local", ft_local)
-	Printf("\n")
+	fmt.Printf("\n")
 
 	ft_clgs, err := fetchFtFromClogsFile(rootDir, flagClogsFile)
 	if err != nil {
