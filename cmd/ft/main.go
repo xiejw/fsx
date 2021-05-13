@@ -15,25 +15,44 @@ var (
 	flagChecksum  = true
 )
 
+type Config struct {
+	RootDir      string
+	ClogsFile    string
+	LoadChecksum bool
+	PrintLocalFS bool
+	PrintClogsFS bool
+}
+
 // Handles a single domain (filetree).
 func main() {
 	fmt.Printf("Hello Ft.\n")
 
-	rootDir := "."
-	ft_local, err := fetchFtFromLocalDir(rootDir, flagChecksum)
-	if err != nil {
-		fmt.Printf("unexpected error: %v", err)
-		return
+	config := Config{
+		RootDir:      ".",
+		ClogsFile:    flagClogsFile,
+		PrintLocalFS: true,
+		PrintClogsFS: true,
+		LoadChecksum: flagChecksum,
 	}
-	printFileTree("local", ft_local)
-	fmt.Printf("\n")
 
-	ft_clgs, err := fetchFtFromClogsFile(rootDir, flagClogsFile)
+	ft_local, err := fetchFtFromLocalDir(config.RootDir, config.LoadChecksum)
 	if err != nil {
 		fmt.Printf("unexpected error: %v", err)
 		return
 	}
-	printFileTree("clogs", ft_clgs)
+	if config.PrintLocalFS {
+		printFileTree("local", ft_local)
+		fmt.Printf("\n")
+	}
+
+	ft_clgs, err := fetchFtFromClogsFile(config.RootDir, config.ClogsFile)
+	if err != nil {
+		fmt.Printf("unexpected error: %v", err)
+		return
+	}
+	if config.PrintClogsFS {
+		printFileTree("clogs", ft_clgs)
+	}
 }
 
 // -------------------------------------------------------------------------------------------------
