@@ -15,7 +15,7 @@ import (
 // public
 // -------------------------------------------------------------------------------------------------
 
-// same as clogs.FileItem
+// FileItem should have same structure as clogs.FileItem.
 type FileItem struct {
 	Path     string // relative to domain.
 	Size     int64  // file size.
@@ -28,7 +28,7 @@ type FileTree struct {
 	Items       []*FileItem // alphabetically sorted items.
 }
 
-// creates a FileTree by walking the baseDir.
+// FromLocalFS creates a FileTree by walking the baseDir.
 func FromLocalFS(baseDir string, checksum bool) (*FileTree, error) {
 	ft, err := fromLocalFS(baseDir, scanner.Walk)
 	if err != nil {
@@ -50,7 +50,7 @@ func FromLocalFS(baseDir string, checksum bool) (*FileTree, error) {
 	return ft, nil
 }
 
-// creates a FileTree by replaying cmds in CmdLogs.
+// FromCmdLogs creates a FileTree by replaying cmds in CmdLogs.
 func FromCmdLogs(baseDir string, clgs *clogs.CmdLogs) (*FileTree, error) {
 	items, err := fromCmdLogs(baseDir, clgs)
 	if err != nil {
@@ -63,9 +63,9 @@ func FromCmdLogs(baseDir string, clgs *clogs.CmdLogs) (*FileTree, error) {
 	}, nil
 }
 
-// steps to convert from src to dst by deleting items in del first, followed by adding items in add.
-// BaseDir is ignored during comparision. Checksum will be checked if and only if HasChecksum are
-// true for both src and dst.
+// ConvertTo produces the steps to convert from src to dst by deleting items in del first, followed
+// by adding items in add.  BaseDir is ignored during comparision. Checksum will be checked if and
+// only if HasChecksum are true for both src and dst.
 func (src *FileTree) ConvertTo(dst *FileTree) (del []*FileItem, add []*FileItem, err error) {
 	// only compare checksum if both exist. useless in other caess.
 	cmp_checksum := src.HasChecksum && dst.HasChecksum

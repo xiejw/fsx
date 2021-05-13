@@ -66,11 +66,18 @@ func main() {
 		}
 
 		if config.PrintDiff {
-			fmt.Printf("del %v items\n", len(del))
+			fmt.Printf("Del %v items\n", len(del))
+			if len(del) == 0 {
+				fmt.Printf("  (empty)\n")
+			}
 			for _, it := range del {
 				fmt.Printf("  - %10d %v\n", it.Size, it.Path)
 			}
-			fmt.Printf("add %v items\n", len(add))
+
+			fmt.Printf("Add %v items\n", len(add))
+			if len(add) == 0 {
+				fmt.Printf("  (empty)\n")
+			}
 			for _, it := range add {
 				fmt.Printf("  + %10d %v\n", it.Size, it.Path)
 			}
