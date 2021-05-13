@@ -63,17 +63,24 @@ func FromCmdLogs(baseDir string, clgs *clogs.CmdLogs) (*FileTree, error) {
 	}, nil
 }
 
+type DiffResult struct {
+	Del []*FileItem
+	Add []*FileItem
+}
+
 // ConvertTo produces the steps to convert from src to dst by deleting items in del first, followed
 // by adding items in add.  BaseDir is ignored during comparision. Checksum will be checked if and
 // only if HasChecksum are true for both src and dst.
-func (src *FileTree) ConvertTo(dst *FileTree) (del []*FileItem, add []*FileItem, err error) {
+func (src *FileTree) ConvertTo(dst *FileTree) (*DiffResult, error) {
 	// only compare checksum if both exist. useless in other caess.
 	cmp_checksum := src.HasChecksum && dst.HasChecksum
 
 	diffs, err := diff(src.Items, dst.Items, cmp_checksum)
 	if err != nil {
-		return
+		return nil, err
 	}
+
+	var add, del []*FileItem
 
 	for _, r := range diffs {
 		// for all cases defined by diffChange, the rule is same.
@@ -84,7 +91,10 @@ func (src *FileTree) ConvertTo(dst *FileTree) (del []*FileItem, add []*FileItem,
 			add = append(add, r.rhs)
 		}
 	}
-	return
+	return &DiffResult{
+		Del: del,
+		Add: add,
+	}, nil
 }
 
 // -------------------------------------------------------------------------------------------------

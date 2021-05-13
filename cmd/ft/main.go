@@ -59,11 +59,14 @@ func main() {
 	}
 
 	if config.DiffFS {
-		del, add, err := ft_clgs.ConvertTo(ft_local)
+		diffResult, err := ft_clgs.ConvertTo(ft_local)
 		if err != nil {
 			fmt.Printf("unexpected error: %v", err)
 			return
 		}
+
+		add := diffResult.Add
+		del := diffResult.Del
 
 		if config.PrintDiff {
 			fmt.Printf("Del %v items\n", len(del))

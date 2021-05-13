@@ -131,10 +131,13 @@ func TestDiffWoCmpChecksum(t *testing.T) {
 		},
 	}
 
-	del, add, err := tree1.ConvertTo(tree2)
+	diffResult, err := tree1.ConvertTo(tree2)
 	if err != nil {
 		t.Fatalf("unexpected err: %v", err)
 	}
+
+	add := diffResult.Add
+	del := diffResult.Del
 
 	expected_del := []*FileItem{
 		{"a/c", 9, "0x1"},
@@ -165,10 +168,12 @@ func TestDiffWCmpChecksum(t *testing.T) {
 		},
 	}
 
-	del, add, err := tree1.ConvertTo(tree2)
+	diffResult, err := tree1.ConvertTo(tree2)
 	if err != nil {
 		t.Fatalf("unexpected err: %v", err)
 	}
+	add := diffResult.Add
+	del := diffResult.Del
 
 	expected_del := []*FileItem{
 		{"a/b", 4, "0x1"},
