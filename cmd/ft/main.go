@@ -17,10 +17,12 @@ var (
 
 type Config struct {
 	RootDir      string
-	ClogsFile    string
 	LoadChecksum bool
+	ClogsFile    string
+	DiffFS       bool
 	PrintLocalFS bool
 	PrintClogsFS bool
+	PrintDiff    bool
 }
 
 // Handles a single domain (filetree).
@@ -29,10 +31,12 @@ func main() {
 
 	config := Config{
 		RootDir:      ".",
+		LoadChecksum: flagChecksum,
 		ClogsFile:    flagClogsFile,
+		DiffFS:       true,
 		PrintLocalFS: true,
 		PrintClogsFS: true,
-		LoadChecksum: flagChecksum,
+		PrintDiff:    true,
 	}
 
 	ft_local, err := fetchFtFromLocalDir(config.RootDir, config.LoadChecksum)
@@ -52,6 +56,25 @@ func main() {
 	}
 	if config.PrintClogsFS {
 		printFileTree("clogs", ft_clgs)
+	}
+
+	if config.DiffFS {
+		del, add, err := ft_clgs.ConvertTo(ft_local)
+		if err != nil {
+			fmt.Printf("unexpected error: %v", err)
+			return
+		}
+
+		if config.PrintDiff {
+			fmt.Printf("del %v items\n", len(del))
+			for _, it := range del {
+				fmt.Printf("  - %10d %v\n", it.Size, it.Path)
+			}
+			fmt.Printf("add %v items\n", len(add))
+			for _, it := range add {
+				fmt.Printf("  + %10d %v\n", it.Size, it.Path)
+			}
+		}
 	}
 }
 
