@@ -120,6 +120,43 @@ func (diff *DiffResult) Print(w io.Writer) {
 	}
 }
 
+func (diff *DiffResult) ToCmdLogs(timestamp int64) ([]*clogs.CmdLog, error) {
+	clgs := make([]*clogs.CmdLog, 0, len(diff.Del)+len(diff.Add))
+
+	for _, it := range diff.Del {
+		if it.Checksum == "" {
+			return nil, errors.New("Delete item should have checksum, but got: %+v\n", it)
+		}
+		clgs = append(clgs, &clogs.CmdLog{
+			Kind: clogs.CmdDel,
+			FileItem: clogs.FileItem{
+				Path:     it.Path,
+				Size:     it.Size,
+				Checksum: it.Checksum,
+			},
+			Timestamp: timestamp,
+		})
+	}
+
+	for _, it := range diff.Add {
+		if it.Checksum == "" {
+			// TODO hash file.
+			return nil, errors.New("Delete item should have checksum, but got: %+v\n", it)
+		}
+		clgs = append(clgs, &clogs.CmdLog{
+			Kind: clogs.CmdNew,
+			FileItem: clogs.FileItem{
+				Path:     it.Path,
+				Size:     it.Size,
+				Checksum: it.Checksum,
+			},
+			Timestamp: timestamp,
+		})
+	}
+
+	return clgs, nil
+}
+
 // -------------------------------------------------------------------------------------------------
 // impl (factory methods to create FileTree)
 // -------------------------------------------------------------------------------------------------

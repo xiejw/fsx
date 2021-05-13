@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"time"
 
 	"github.com/xiejw/fsx/src/clogs"
 	"github.com/xiejw/fsx/src/errors"
@@ -16,13 +17,15 @@ var (
 )
 
 type Config struct {
-	RootDir      string
-	LoadChecksum bool
-	ClogsFile    string
-	DiffFS       bool
-	PrintLocalFS bool
-	PrintClogsFS bool
-	PrintDiff    bool
+	RootDir               string
+	LoadChecksum          bool
+	ClogsFile             string
+	DiffFS                bool
+	GenerateCmdLogsChange bool // Need DiffFS
+	PrintLocalFS          bool
+	PrintClogsFS          bool
+	PrintDiff             bool
+	PrintCmdLogsChange    bool
 }
 
 // Handles a single domain (filetree).
@@ -30,13 +33,15 @@ func main() {
 	fmt.Printf("Hello Ft.\n")
 
 	config := Config{
-		RootDir:      ".",
-		LoadChecksum: flagChecksum,
-		ClogsFile:    flagClogsFile,
-		DiffFS:       true,
-		PrintLocalFS: true,
-		PrintClogsFS: true,
-		PrintDiff:    true,
+		RootDir:               ".",
+		LoadChecksum:          flagChecksum,
+		ClogsFile:             flagClogsFile,
+		DiffFS:                true,
+		GenerateCmdLogsChange: true,
+		PrintLocalFS:          true,
+		PrintClogsFS:          true,
+		PrintDiff:             true,
+		PrintCmdLogsChange:    true,
 	}
 
 	ft_local, err := fetchFtFromLocalDir(config.RootDir, config.LoadChecksum)
@@ -67,6 +72,24 @@ func main() {
 
 		if config.PrintDiff {
 			diffResult.Print(os.Stdout)
+		}
+
+		if config.GenerateCmdLogsChange {
+			clgs, err := diffResult.ToCmdLogs(time.Now().Unix())
+			if err != nil {
+				fmt.Printf("unexpected error: %v", err)
+				return
+			}
+
+			if config.PrintCmdLogsChange {
+				fmt.Printf("CLogs changes:\n")
+				if len(clgs) == 0 {
+					fmt.Printf("(empty)\n")
+				}
+				for _, clg := range clgs {
+					fmt.Printf("%+v\n", clg.ToOneLine())
+				}
+			}
 		}
 	}
 }
