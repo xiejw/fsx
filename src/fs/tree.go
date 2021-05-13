@@ -2,6 +2,7 @@ package fs
 
 import (
 	"fmt"
+	"io"
 	"path"
 	"sort"
 
@@ -95,6 +96,28 @@ func (src *FileTree) ConvertTo(dst *FileTree) (*DiffResult, error) {
 		Del: del,
 		Add: add,
 	}, nil
+}
+
+// Print prints the DiffResult to writer.
+func (diff *DiffResult) Print(w io.Writer) {
+	add := diff.Add
+	del := diff.Del
+
+	fmt.Fprintf(w, "Del %v items\n", len(del))
+	if len(del) == 0 {
+		fmt.Fprintf(w, "  (empty)\n")
+	}
+	for _, it := range del {
+		fmt.Fprintf(w, "  - %10d %v\n", it.Size, it.Path)
+	}
+
+	fmt.Printf("Add %v items\n", len(add))
+	if len(add) == 0 {
+		fmt.Fprintf(w, "  (empty)\n")
+	}
+	for _, it := range add {
+		fmt.Fprintf(w, "  + %10d %v\n", it.Size, it.Path)
+	}
 }
 
 // -------------------------------------------------------------------------------------------------
