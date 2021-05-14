@@ -22,6 +22,7 @@ type Config struct {
 	ClogsFile             string
 	DiffFS                bool
 	GenerateCmdLogsChange bool // Need DiffFS
+	SyncToFile            bool // Need GenerateCmdLogsChange
 	PrintLocalFS          bool
 	PrintClogsFS          bool
 	PrintDiff             bool
@@ -38,6 +39,7 @@ func main() {
 		ClogsFile:             flagClogsFile,
 		DiffFS:                true,
 		GenerateCmdLogsChange: true,
+		SyncToFile:            true,
 		PrintLocalFS:          true,
 		PrintClogsFS:          true,
 		PrintDiff:             true,
@@ -63,33 +65,37 @@ func main() {
 		printFileTree("clogs", ft_clgs)
 	}
 
-	if config.DiffFS {
-		diffResult, err := ft_clgs.ConvertTo(ft_local)
-		if err != nil {
-			fmt.Printf("unexpected error: %v", err)
-			return
+	if !config.DiffFS {
+		return
+	}
+
+	diffResult, err := ft_clgs.ConvertTo(ft_local)
+	if err != nil {
+		fmt.Printf("unexpected error: %v", err)
+		return
+	}
+
+	if config.PrintDiff {
+		diffResult.Print(os.Stdout)
+	}
+
+	if !config.GenerateCmdLogsChange {
+		return
+	}
+
+	clgs, err := diffResult.ToCmdLogs(time.Now().Unix())
+	if err != nil {
+		fmt.Printf("unexpected error: %v", err)
+		return
+	}
+
+	if config.PrintCmdLogsChange {
+		fmt.Printf("CLogs changes:\n")
+		if len(clgs) == 0 {
+			fmt.Printf("(empty)\n")
 		}
-
-		if config.PrintDiff {
-			diffResult.Print(os.Stdout)
-		}
-
-		if config.GenerateCmdLogsChange {
-			clgs, err := diffResult.ToCmdLogs(time.Now().Unix())
-			if err != nil {
-				fmt.Printf("unexpected error: %v", err)
-				return
-			}
-
-			if config.PrintCmdLogsChange {
-				fmt.Printf("CLogs changes:\n")
-				if len(clgs) == 0 {
-					fmt.Printf("(empty)\n")
-				}
-				for _, clg := range clgs {
-					fmt.Printf("%+v\n", clg.ToOneLine())
-				}
-			}
+		for _, clg := range clgs {
+			fmt.Printf("%+v\n", clg.ToOneLine())
 		}
 	}
 }
