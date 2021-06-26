@@ -31,7 +31,7 @@ CL      = @echo ${CCYAN}'!!! clean...'${CEND} &&
 endif
 
 # ------------------------------------------------------------------------------
-# common actions.
+# Common actions.
 # ------------------------------------------------------------------------------
 
 BUILD_DIR = .build
@@ -41,13 +41,19 @@ ${BUILD_DIR}:
 
 
 # ------------------------------------------------------------------------------
-# template to generate go binary rules.
+# Template to generate go binary rules.
 # ------------------------------------------------------------------------------
 
 # The convention is for cmd <binary> the main file is cmd/<binary>/main.go.
-# Go needs to rebuild every change from library (no easy to track dependency),
-# so we make the <binary> target as PHONY. $(2) is output dir and $(1) is binary
-# name.
+#
+# Go needs to rebuild every change from library (no easy way to express the
+# dependency in makefile system), so we make the <binary> target as PHONY. So go
+# compiler toolchain will re-check each time. As go compilation is very fast, the
+# overhead is negligible.
+#
+# Args:
+#   - $(1) is binary name.
+#   - $(2) is output dir.
 define objs
 
 .PHONY: $(2)/$(1)
