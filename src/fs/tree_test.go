@@ -7,8 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/xiejw/lunar/scanner"
+
 	"github.com/xiejw/fsx/src/clogs"
-	"github.com/xiejw/fsx/src/fs/internal/scanner"
 )
 
 func TestFileItemStructSameAsCLogsFileItem(t *testing.T) {

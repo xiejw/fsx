@@ -7,10 +7,10 @@ import (
 	"sort"
 
 	"github.com/xiejw/lunar/base/errors"
+	"github.com/xiejw/lunar/base/crypto"
+	"github.com/xiejw/lunar/scanner"
 
 	"github.com/xiejw/fsx/src/clogs"
-	"github.com/xiejw/fsx/src/fs/internal/crypto"
-	"github.com/xiejw/fsx/src/fs/internal/scanner"
 )
 
 // -------------------------------------------------------------------------------------------------
