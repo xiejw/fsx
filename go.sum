@@ -1,0 +1,3 @@
+github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
+github.com/xiejw/lunar v0.0.0-20210706151721-5bf60b4631a7 h1:b0bWcW2yvnmT5HElbctG3NcjTeqY7YqWwd3xLL1ym80=
+github.com/xiejw/lunar v0.0.0-20210706151721-5bf60b4631a7/go.mod h1:EGjW+FT4SmpKzcHEdkPyy2s6Z7xXVWh8lcVVm8V6/yw=

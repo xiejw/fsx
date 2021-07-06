@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/xiejw/fsx/src/errors"
+	"github.com/xiejw/lunar/base/errors"
 )
 
 // -------------------------------------------------------------------------------------------------

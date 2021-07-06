@@ -6,8 +6,9 @@ import (
 	"path"
 	"sort"
 
+	"github.com/xiejw/lunar/base/errors"
+
 	"github.com/xiejw/fsx/src/clogs"
-	"github.com/xiejw/fsx/src/errors"
 	"github.com/xiejw/fsx/src/fs/internal/crypto"
 	"github.com/xiejw/fsx/src/fs/internal/scanner"
 )

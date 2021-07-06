@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/xiejw/fsx/src/errors"
+	"github.com/xiejw/lunar/base/errors"
 )
 
 type FileItem struct {
