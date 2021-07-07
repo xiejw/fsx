@@ -1,4 +1,4 @@
-include go.mk
+include ../lunar/go.mk
 
 # ------------------------------------------------------------------------------
 # Global configuraiton.
